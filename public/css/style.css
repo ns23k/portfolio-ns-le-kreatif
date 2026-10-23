@@ -755,3 +755,12 @@ html.dark .web-body .cat{color:var(--accent);}
   .web-card:hover{transform:none;}
 }
 @media (prefers-reduced-motion: reduce){ .shot img{transition:none;} }
+
+/* ---------- Menu : 8 liens → burger plus tôt, logo jamais coupé ---------- */
+.logo{white-space:nowrap; flex-shrink:0;}
+.nav-links a{white-space:nowrap;}
+@media (max-width:1240px){ .nav-links{gap:24px;} }
+@media (max-width:1080px){
+  .nav-links{display:none;}
+  .burger{display:flex;}
+}

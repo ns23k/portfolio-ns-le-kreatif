@@ -779,3 +779,6 @@ html.dark .web-body .cat{color:var(--accent);}
 }
 @media (max-width:720px){ .web-link{align-self:flex-start; justify-content:flex-start;} }
 @media (prefers-reduced-motion: reduce){ .web-link{animation:none;} }
+
+/* ---------- Badge « Design original » en Marcellus ---------- */
+.badge-float{font-family:'Marcellus', serif; font-weight:400; font-size:14px; letter-spacing:.02em;}

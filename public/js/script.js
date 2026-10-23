@@ -130,6 +130,19 @@ const sportSection = document.getElementById('sport');
    RÉALISATIONS WEB
 ============================================ */
 function hostOf(u){ try { return new URL(u).host.replace(/^www\./,''); } catch { return ''; } }
+/* capture du site en mode sombre quand le portfolio est en mode sombre (captures automatiques uniquement) */
+const isDark = () => document.documentElement.classList.contains('dark');
+function webShot(src){
+  if(!isDark() || !/^https:\/\/api\.microlink\.io\//.test(src || '')) return src;
+  return src + '&colorScheme=dark';
+}
+new MutationObserver(() => {
+  document.querySelectorAll('#webGrid .shot img[data-light]').forEach(img => {
+    const next = webShot(img.dataset.light);
+    if(img.getAttribute('src') !== next) img.src = next;
+  });
+}).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+
 function renderWeb(){
   const grid = document.getElementById('webGrid');
   const section = document.getElementById('web');
@@ -142,7 +155,7 @@ function renderWeb(){
     <article class="web-card reveal">
       <a class="browser" ${w.link ? `href="${NK.esc(w.link)}" target="_blank" rel="noopener"` : ''} aria-label="${NK.esc(w.title)}${w.link ? ' — ouvrir le site' : ''}">
         <div class="browser-bar"><span class="dots"><i></i><i></i><i></i></span><span class="browser-url"><i class="fa-solid fa-lock"></i> ${NK.esc(host || w.title)}</span></div>
-        <div class="shot"><img src="${NK.esc(w.src)}" alt="Aperçu du site ${NK.esc(w.title)}" loading="lazy" decoding="async"></div>
+        <div class="shot"><img src="${NK.esc(webShot(w.src))}" data-light="${NK.esc(w.src)}" alt="Aperçu du site ${NK.esc(w.title)}" loading="lazy" decoding="async"></div>
       </a>
       <div class="web-body">
         <span class="cat">${NK.esc(w.catLabel)}</span>
@@ -163,7 +176,8 @@ function renderWeb(){
       box.style.setProperty('--dur', `${Math.min(14, Math.max(3, dist / 260))}s`);
       box.classList.toggle('can-scroll', dist > 40);
     };
-    img.complete ? set() : img.addEventListener('load', set, { once: true });
+    if(img.complete) set();
+    img.addEventListener('load', set);
     window.addEventListener('resize', set, { passive: true });
   });
 }

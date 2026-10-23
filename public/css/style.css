@@ -587,3 +587,7 @@ h1, h2, h3, h4{font-family:var(--font-title); letter-spacing:.01em;}
 /* surlignage qui suit le texte ligne par ligne (titres sur plusieurs lignes) */
 .mark{display:inline; background:linear-gradient(transparent 56%, var(--accent) 56%, var(--accent) 90%, transparent 90%); -webkit-box-decoration-break:clone; box-decoration-break:clone; padding:0 .12em;}
 .mark::after{content:none;}
+/* plus de bandeau jaune : les mots mis en avant passent en couleur */
+.mark{background:none; padding:0; color:var(--brand);}
+html.dark .mark{color:var(--accent);}
+.hero h1 .mark, .track-hero h1 .mark, .quote-left .mark{color:var(--accent);}

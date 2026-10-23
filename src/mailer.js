@@ -29,7 +29,7 @@ function layout(title, inner) {
   return `<!doctype html><html><body style="margin:0;background:#F5F6FA;font-family:Arial,Helvetica,sans-serif;color:#10142B">
   <div style="max-width:560px;margin:0 auto;padding:28px 16px">
     <div style="background:#0E2A5E;color:#fff;border-radius:14px 14px 0 0;padding:20px 24px;font-weight:800;font-size:20px">
-      ns_le <span style="background:#F2B705;color:#141414;padding:0 4px">kréatif</span>
+      ns_le <span>kréatif</span>
     </div>
     <div style="background:#fff;border-radius:0 0 14px 14px;padding:24px;border:1px solid #E2E5F0;border-top:none">
       <h2 style="margin:0 0 14px;font-size:19px">${esc(title)}</h2>

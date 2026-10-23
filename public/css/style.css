@@ -631,3 +631,4 @@ html.dark .g-item.is-logo .thumb{background:#fff;}
 .g-item.is-mockup:hover img{transform:scale(1.035);}
 .slide.is-mockup img{object-fit:contain; background:#0B1A38;}
 .lightbox.is-mockup .lightbox-inner img{object-fit:contain; background:#0B1A38;}
+.logo span::after{content:none; display:none;}

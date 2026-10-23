@@ -304,3 +304,33 @@ dialog::backdrop{background:rgba(5,9,22,.6); backdrop-filter:blur(3px);}
 }
 .wcard.is-carte .wthumb img{width:auto; height:auto; max-width:100%; max-height:100%; border:1px solid rgba(16,20,43,.16); border-radius:5px; box-shadow:0 1px 2px rgba(16,20,43,.08), 0 8px 18px -10px rgba(16,20,43,.35);}
 .wcard.is-web .wthumb img, .drop img{object-position:top;}
+
+/* ---------- Mon compte ---------- */
+.account-grid{display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr); gap:16px; align-items:start; max-width:980px;}
+.account-card{padding:24px;}
+.account-current{padding-top:16px; margin-top:4px; border-top:1px solid var(--border);}
+.account-foot{display:flex; justify-content:flex-end;}
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:46px;}
+.pw-eye{position:absolute; right:6px; top:50%; transform:translateY(-50%); width:34px; height:34px; border:none; background:transparent; color:var(--muted); border-radius:8px;}
+.pw-eye:hover{color:var(--brand); background:var(--surface);}
+.pw-meter{display:flex; align-items:center; gap:10px; margin-top:8px; font-size:12px; font-weight:700;}
+.pw-meter i{flex:1; height:6px; border-radius:6px; background:var(--surface-2); position:relative; overflow:hidden;}
+.pw-meter i::after{content:""; position:absolute; inset:0 auto 0 0; width:25%; background:var(--bad); border-radius:6px; transition:width .3s, background .3s;}
+.pw-meter[data-level="mid"] i::after{width:55%; background:#E0A100;}
+.pw-meter[data-level="good"] i::after{width:80%; background:#3BA55C;}
+.pw-meter[data-level="strong"] i::after{width:100%; background:var(--ok);}
+.pw-meter span{min-width:72px; text-align:right; color:var(--muted);}
+.account-info h2{font-size:16px; font-weight:800; margin-bottom:12px;}
+.account-info ul{list-style:none; display:flex; flex-direction:column; gap:12px; margin-bottom:16px;}
+.account-info li{display:grid; grid-template-columns:20px 1fr; gap:10px; font-size:13.5px; color:var(--muted); line-height:1.55;}
+.account-info li i{color:var(--accent); margin-top:3px;}
+.account-info code{font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--surface-2); padding:1px 6px; border-radius:5px; color:var(--text);}
+.account-who{font-size:13px; color:var(--muted); padding-top:12px; border-top:1px solid var(--border);}
+.notice-reset{display:flex; gap:10px; background:var(--warn-bg); color:var(--warn); border-radius:12px; padding:12px 14px; font-size:13px; margin-bottom:16px; line-height:1.5;}
+@media (max-width:900px){
+  .account-grid{grid-template-columns:1fr;}
+  .account-card{padding:18px;}
+  .account-foot .btn{width:100%;}
+  .mobile-tabs{grid-template-columns:repeat(4,1fr);}
+}

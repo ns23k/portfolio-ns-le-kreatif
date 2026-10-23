@@ -182,34 +182,75 @@ app.post('/api/track/reply', rateLimit('trackreply', 10, 10 * 60 * 1000), wrap(a
    ADMIN — session
 ============================================================ */
 // seuls les échecs comptent : 8 erreurs → blocage 15 min pour cette IP
-app.post('/api/admin/login', (req, res) => {
+const account = require('./account');
+const FAIL_WINDOW = 15 * 60 * 1000;
+function tooManyFails(req, scope) {
+  const f = hits.get(`${scope}:${req.ip}`);
+  return f && Date.now() - f.t < FAIL_WINDOW && f.n >= 8;
+}
+function noteFail(req, scope) {
+  const key = `${scope}:${req.ip}`, now = Date.now();
+  const f = hits.get(key);
+  const e = f && now - f.t < FAIL_WINDOW ? f : { n: 0, t: now };
+  e.n++; hits.set(key, e);
+}
+
+app.post('/api/admin/login', wrap(async (req, res) => {
   const { user, password } = req.body || {};
-  if (!process.env.ADMIN_PASSWORD) return res.status(500).json({ error: "ADMIN_PASSWORD n'est pas configuré sur le serveur." });
-  const key = `loginfail:${req.ip}`, now = Date.now();
-  const fails = hits.get(key);
-  if (fails && now - fails.t < 15 * 60 * 1000 && fails.n >= 8) {
-    return res.status(429).json({ error: 'Trop de tentatives, réessaie dans 15 minutes.' });
+  if (tooManyFails(req, 'loginfail')) return res.status(429).json({ error: 'Trop de tentatives, réessaie dans 15 minutes.' });
+  const acc = await account.verifyCredentials(str(user, 100), String(password ?? ''));
+  if (!acc) {
+    noteFail(req, 'loginfail');
+    const hint = !process.env.ADMIN_PASSWORD && acc === null && (await account.getAccount()).source === 'env'
+      ? " (ADMIN_PASSWORD n'est pas configuré sur le serveur)" : '';
+    return res.status(401).json({ error: 'Identifiant ou mot de passe incorrect.' + hint });
   }
-  if (!auth.checkCredentials(str(user, 100), String(password ?? ''))) {
-    const e = fails && now - fails.t < 15 * 60 * 1000 ? fails : { n: 0, t: now };
-    e.n++; hits.set(key, e);
-    return res.status(401).json({ error: 'Identifiant ou mot de passe incorrect.' });
-  }
-  hits.delete(key);
-  auth.setSessionCookie(req, res, auth.createToken(str(user, 100)));
-  res.json({ ok: true, user: str(user, 100) });
-});
+  hits.delete(`loginfail:${req.ip}`);
+  auth.setSessionCookie(req, res, auth.createToken(acc.user, acc.ver));
+  res.json({ ok: true, user: acc.user });
+}));
 
 app.post('/api/admin/logout', (req, res) => { auth.clearSessionCookie(res); res.json({ ok: true }); });
 
-app.get('/api/admin/me', (req, res) => {
-  const s = auth.verifyToken(auth.readCookie(req, auth.COOKIE));
+app.get('/api/admin/me', wrap(async (req, res) => {
+  const s = await auth.currentSession(req);
   if (!s) return res.status(401).json({ error: 'Non connecté' });
-  res.json({ user: s.u, mail: mailer.enabled(), categories: CATS, statuses: STATUSES, projectTypes: PROJECT_TYPES });
-});
+  res.json({
+    user: s.u, mail: mailer.enabled(), categories: CATS, statuses: STATUSES, projectTypes: PROJECT_TYPES,
+    account: { user: s.account.user, source: s.account.source, reset: process.env.ADMIN_RESET === '1' },
+  });
+}));
 
 const admin = express.Router();
 admin.use(auth.requireAdmin);
+
+/* ---------- mon compte : identifiant + mot de passe ---------- */
+admin.post('/account', wrap(async (req, res) => {
+  if (tooManyFails(req, 'accountfail')) return res.status(429).json({ error: 'Trop de tentatives, réessaie dans 15 minutes.' });
+  const b = req.body || {};
+  const current = String(b.currentPassword ?? '');
+  const newUser = str(b.newUser, 60) || req.account.user;
+  const newPass = String(b.newPassword ?? '');
+  const fields = {};
+  if (!(await account.verifyCredentials(req.account.user, current))) {
+    noteFail(req, 'accountfail');
+    return res.status(422).json({ error: 'Mot de passe actuel incorrect.', fields: { currentPassword: 'Mot de passe actuel incorrect.' } });
+  }
+  if (!/^[A-Za-z0-9._@-]{3,40}$/.test(newUser)) fields.newUser = 'Identifiant : 3 à 40 caractères (lettres, chiffres, . _ - @), sans espace.';
+  if (newPass) {
+    if (newPass.length < 10) fields.newPassword = 'Au moins 10 caractères.';
+    else if (newPass.length > 200) fields.newPassword = 'Mot de passe trop long.';
+    else if (!/[A-Za-z]/.test(newPass) || !/[0-9]/.test(newPass)) fields.newPassword = 'Mélange au moins des lettres et des chiffres.';
+    else if (newPass.toLowerCase() === newUser.toLowerCase()) fields.newPassword = "Le mot de passe ne doit pas être l'identifiant.";
+    if (b.confirmPassword !== undefined && b.confirmPassword !== newPass) fields.confirmPassword = 'Les deux mots de passe ne correspondent pas.';
+  }
+  if (!newPass && newUser === req.account.user) return res.status(422).json({ error: 'Aucune modification à enregistrer.' });
+  if (Object.keys(fields).length) return res.status(422).json({ error: 'Vérifie les champs signalés.', fields });
+  hits.delete(`accountfail:${req.ip}`);
+  const acc = await account.setAccount(newUser, newPass || current);
+  auth.setSessionCookie(req, res, auth.createToken(acc.user, acc.ver)); // reste connecté sur cet appareil
+  res.json({ ok: true, user: acc.user, passwordChanged: Boolean(newPass), userChanged: newUser !== req.account.user });
+}));
 
 /* ---------- tableau de bord ---------- */
 admin.get('/stats', wrap(async (req, res) => {

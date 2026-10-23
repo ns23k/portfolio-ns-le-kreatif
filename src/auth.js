@@ -12,8 +12,8 @@ function secret() {
 const b64 = (buf) => Buffer.from(buf).toString('base64url');
 const sign = (data) => crypto.createHmac('sha256', secret()).update(data).digest('base64url');
 
-function createToken(user) {
-  const payload = b64(JSON.stringify({ u: user, exp: Date.now() + TTL_MS }));
+function createToken(user, ver = 'env') {
+  const payload = b64(JSON.stringify({ u: user, v: ver, exp: Date.now() + TTL_MS }));
   return `${payload}.${sign(payload)}`;
 }
 
@@ -26,19 +26,6 @@ function verifyToken(token) {
     const data = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8'));
     return data.exp > Date.now() ? data : null;
   } catch { return null; }
-}
-
-function safeEqual(a, b) {
-  const ha = crypto.createHash('sha256').update(String(a)).digest();
-  const hb = crypto.createHash('sha256').update(String(b)).digest();
-  return crypto.timingSafeEqual(ha, hb);
-}
-
-function checkCredentials(user, pass) {
-  const U = process.env.ADMIN_USER || 'admin';
-  const P = process.env.ADMIN_PASSWORD;
-  if (!P) return false;
-  return safeEqual(user, U) & safeEqual(pass, P); // pas de court-circuit
 }
 
 function readCookie(req, name) {
@@ -61,15 +48,28 @@ function clearSessionCookie(res) {
   res.setHeader('Set-Cookie', `${COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`);
 }
 
-function requireAdmin(req, res, next) {
+// Session valide = signature OK + non expirée + même identifiant/version que le compte actuel
+// (changer d'identifiant ou de mot de passe déconnecte donc toutes les autres sessions).
+async function currentSession(req) {
   const session = verifyToken(readCookie(req, COOKIE));
-  if (!session) return res.status(401).json({ error: 'Session expirée, reconnecte-toi.' });
-  // protection CSRF : les requêtes qui modifient doivent venir de notre JS
-  if (req.method !== 'GET' && req.headers['x-nk-admin'] !== '1') {
-    return res.status(403).json({ error: 'Requête refusée.' });
-  }
-  req.admin = session.u;
-  next();
+  if (!session) return null;
+  const { getAccount } = require('./account');
+  const acc = await getAccount();
+  if (session.u !== acc.user || (session.v || 'env') !== acc.ver) return null;
+  return { ...session, account: acc };
 }
 
-module.exports = { createToken, verifyToken, checkCredentials, setSessionCookie, clearSessionCookie, requireAdmin, readCookie, COOKIE };
+function requireAdmin(req, res, next) {
+  currentSession(req).then((session) => {
+    if (!session) return res.status(401).json({ error: 'Session expirée, reconnecte-toi.' });
+    // protection CSRF : les requêtes qui modifient doivent venir de notre JS
+    if (req.method !== 'GET' && req.headers['x-nk-admin'] !== '1') {
+      return res.status(403).json({ error: 'Requête refusée.' });
+    }
+    req.admin = session.u;
+    req.account = session.account;
+    next();
+  }, next);
+}
+
+module.exports = { createToken, verifyToken, currentSession, setSessionCookie, clearSessionCookie, requireAdmin, readCookie, COOKIE };

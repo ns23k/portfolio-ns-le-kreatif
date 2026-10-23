@@ -126,9 +126,19 @@ Pour que les emails partent tout seuls (confirmation au client, notification pou
 - **Lien de suivi** copie l'adresse à envoyer au client si besoin.
 - Le tableau de bord affiche le total des devis acceptés en F CFA.
 
+## Changer son identifiant ou son mot de passe
+
+Dans l'admin, va dans **Mon compte** (menu de gauche, ou onglet « Compte » sur mobile) :
+- modifie l'identifiant et/ou saisis un nouveau mot de passe (10 caractères minimum, lettres + chiffres) ;
+- valide avec ton **mot de passe actuel**.
+
+Le mot de passe est chiffré (scrypt) dans la base. Tu restes connecté sur l'appareil utilisé ; tous les autres appareils sont déconnectés.
+
+**Mot de passe oublié ?** Dans Vercel → Settings → Environment Variables, ajoute `ADMIN_RESET` = `1` puis redéploie : la connexion revient à `ADMIN_USER` / `ADMIN_PASSWORD`. Choisis un nouveau mot de passe dans « Mon compte », puis **supprime `ADMIN_RESET`** et redéploie.
+
 ## Sécurité
 
-- Le mot de passe admin n'est **jamais** écrit dans le code : il reste dans les variables d'environnement.
+- Le mot de passe admin n'est **jamais** écrit dans le code : au départ il vient des variables d'environnement, puis il est stocké chiffré (scrypt) dès que tu le changes dans « Mon compte ».
 - La session est stockée dans un cookie sécurisé (`HttpOnly`, `SameSite=Strict`) et dure 12 h.
 - Après 8 mauvais mots de passe, la connexion est bloquée 15 minutes.
 - Le formulaire de devis est limité à 6 envois par IP toutes les 10 minutes et contient un piège anti-robots.

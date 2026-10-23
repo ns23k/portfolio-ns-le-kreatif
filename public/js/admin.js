@@ -73,9 +73,10 @@ function armed(btn, label = 'Confirmer ?'){
    CONNEXION
 ============================================ */
 function showLogin(){
+  try { const last = localStorage.getItem('nk-admin-user'); if(last && !$('#luser').value) $('#luser').value = last; } catch {}
   $('#appView').hidden = true;
   $('#loginView').hidden = false;
-  setTimeout(() => $('#lpass').focus(), 50);
+  setTimeout(() => ($('#luser').value ? $('#lpass') : $('#luser')).focus(), 50);
 }
 async function boot(){
   try {
@@ -86,6 +87,7 @@ async function boot(){
     $('#loginView').hidden = true;
     $('#appView').hidden = false;
     $('#hello').textContent = `Bonjour ${data.user} 👋`;
+    try { localStorage.setItem('nk-admin-user', data.user); } catch {}
     fillCatSelect();
     route();
     refreshBadge();
@@ -126,12 +128,13 @@ window.addEventListener('hashchange', route);
 function route(){
   if($('#appView').hidden) return;
   const [view, id] = (location.hash.slice(1) || 'dashboard').split('/');
-  const v = ['dashboard', 'creas', 'devis'].includes(view) ? view : 'dashboard';
+  const v = ['dashboard', 'creas', 'devis', 'compte'].includes(view) ? view : 'dashboard';
   $$('[data-section]').forEach(s => s.hidden = s.dataset.section !== v);
   $$('[data-view]').forEach(a => a.classList.toggle('active', a.dataset.view === v));
   if(v === 'dashboard') loadDashboard();
   if(v === 'creas') loadWorks();
   if(v === 'devis') loadQuotes(id ? Number(id) : null);
+  if(v === 'compte') loadAccount();
   window.scrollTo(0, 0);
 }
 
@@ -647,5 +650,69 @@ async function openQuote(id){
     } catch (err) { toast(err.message, true); btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Envoyer la réponse'; }
   });
 }
+
+/* ============================================
+   MON COMPTE
+============================================ */
+function loadAccount(){
+  const acc = state.me?.account || { user: state.me?.user };
+  $('#acUser').value = acc.user || '';
+  $('#acWho').textContent = acc.user || '—';
+  ['#acNew', '#acConfirm', '#acCurrent'].forEach(id => { $(id).value = ''; $(id).type = 'password'; });
+  $$('.pw-eye i').forEach(i => i.className = 'fa-solid fa-eye');
+  $('#resetNotice').hidden = !acc.reset;
+  $('#acConfirmField').hidden = true; $('#pwMeter').hidden = true;
+  clearAccountErrors();
+}
+function clearAccountErrors(){ $$('#accountForm .field').forEach(f => f.classList.remove('invalid')); $$('#accountForm [data-err]').forEach(e => e.textContent = ''); }
+function accountError(name, msg){ const e = $(`#accountForm [data-err="${name}"]`); if(!e) return; e.textContent = msg; e.closest('.field').classList.add('invalid'); }
+
+$$('.pw-eye').forEach(b => b.addEventListener('click', () => {
+  const input = $('#' + b.dataset.eye); const show = input.type === 'password';
+  input.type = show ? 'text' : 'password';
+  b.querySelector('i').className = show ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+  b.setAttribute('aria-label', show ? 'Masquer le mot de passe' : 'Afficher le mot de passe');
+}));
+
+function strength(pw){
+  let sc = 0;
+  if(pw.length >= 10) sc++; if(pw.length >= 14) sc++;
+  if(/[a-z]/.test(pw) && /[A-Z]/.test(pw)) sc++;
+  if(/[0-9]/.test(pw)) sc++; if(/[^A-Za-z0-9]/.test(pw)) sc++;
+  if(pw.length < 10 || !/[A-Za-z]/.test(pw) || !/[0-9]/.test(pw)) sc = Math.min(sc, 1);
+  return [['Trop faible', 'weak'], ['Faible', 'weak'], ['Moyen', 'mid'], ['Bon', 'good'], ['Très bon', 'strong'], ['Excellent', 'strong']][sc];
+}
+$('#acNew').addEventListener('input', () => {
+  const pw = $('#acNew').value;
+  $('#acConfirmField').hidden = !pw; $('#pwMeter').hidden = !pw;
+  if(!pw) return;
+  const [label, cls] = strength(pw);
+  const m = $('#pwMeter'); m.dataset.level = cls; m.querySelector('span').textContent = label;
+});
+
+$('#accountForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  clearAccountErrors();
+  const newUser = $('#acUser').value.trim(), newPassword = $('#acNew').value, confirmPassword = $('#acConfirm').value, currentPassword = $('#acCurrent').value;
+  let bad = false;
+  if(!/^[A-Za-z0-9._@-]{3,40}$/.test(newUser)){ accountError('newUser', 'Identifiant : 3 à 40 caractères (lettres, chiffres, . _ - @), sans espace.'); bad = true; }
+  if(newPassword && newPassword !== confirmPassword){ accountError('confirmPassword', 'Les deux mots de passe ne correspondent pas.'); bad = true; }
+  if(!currentPassword){ accountError('currentPassword', 'Entre ton mot de passe actuel pour valider.'); bad = true; }
+  if(bad){ $('#accountForm .field.invalid input')?.focus(); return; }
+  const btn = $('#acSave'); btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
+  try {
+    const r = await api('/api/admin/account', { method:'POST', body: JSON.stringify({ newUser, newPassword, confirmPassword: newPassword ? confirmPassword : undefined, currentPassword }) });
+    state.me.user = r.user; state.me.account = { ...(state.me.account || {}), user: r.user, source: 'db', reset: state.me.account?.reset };
+    $('#hello').textContent = `Bonjour ${r.user} 👋`;
+    $('#luser').value = r.user;
+    try { localStorage.setItem('nk-admin-user', r.user); } catch {}
+    toast(r.passwordChanged && r.userChanged ? 'Identifiant et mot de passe mis à jour' : r.passwordChanged ? 'Mot de passe mis à jour' : 'Identifiant mis à jour');
+    loadAccount();
+  } catch (err) {
+    if(err.fields) Object.entries(err.fields).forEach(([k, m]) => accountError(k, m));
+    else toast(err.message, true);
+    if(err.status === 401 && !err.fields) return;
+  } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Enregistrer les modifications'; }
+});
 
 boot();

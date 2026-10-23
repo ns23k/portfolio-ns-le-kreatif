@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="css/admin.css?v=202610231724">
+<link rel="stylesheet" href="css/admin.css?v=202610231736">
 <script>try{var t=localStorage.getItem('nk-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}</script>
 </head>
 <body>
@@ -22,7 +22,7 @@
     <p>Gère tes créations et réponds aux demandes de devis.</p>
     <div class="field">
       <label for="luser">Identifiant</label>
-      <input id="luser" autocomplete="username" value="admin">
+      <input id="luser" autocomplete="username" spellcheck="false" autocapitalize="off" placeholder="Ton identifiant">
     </div>
     <div class="field" id="lpassField">
       <label for="lpass">Mot de passe</label>
@@ -42,6 +42,7 @@
       <a href="#dashboard" data-view="dashboard"><i class="fa-solid fa-gauge-high"></i> Tableau de bord</a>
       <a href="#creas" data-view="creas"><i class="fa-solid fa-images"></i> Créations</a>
       <a href="#devis" data-view="devis"><i class="fa-solid fa-file-invoice"></i> Devis <span class="count" data-unread hidden></span></a>
+      <a href="#compte" data-view="compte"><i class="fa-solid fa-user-shield"></i> Mon compte</a>
     </nav>
     <div class="side-foot">
       <a href="index.html" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Voir le site</a>
@@ -114,12 +115,63 @@
         </div>
       </div>
     </section>
+
+    <!-- mon compte -->
+    <section data-section="compte" hidden>
+      <div class="topbar">
+        <div><h1>Mon compte</h1><p>Change ton identifiant et ton mot de passe de connexion à l'admin.</p></div>
+      </div>
+      <div class="account-grid">
+        <form class="card account-card" id="accountForm" novalidate autocomplete="off">
+          <div class="notice-reset" id="resetNotice" hidden>
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <span><b>Mode secours actif (ADMIN_RESET=1).</b> Choisis un nouveau mot de passe ici, puis supprime la variable ADMIN_RESET dans Vercel et redéploie.</span>
+          </div>
+          <div class="field">
+            <label for="acUser">Identifiant</label>
+            <input id="acUser" autocomplete="username" maxlength="40" spellcheck="false" autocapitalize="off">
+            <span class="err" data-err="newUser"></span>
+            <div class="hint">3 à 40 caractères : lettres, chiffres, point, tiret, @. Sans espace.</div>
+          </div>
+          <div class="field">
+            <label for="acNew">Nouveau mot de passe <span style="text-transform:none; font-weight:500;">(laisser vide pour ne pas le changer)</span></label>
+            <div class="pw-wrap"><input id="acNew" type="password" autocomplete="new-password" maxlength="200"><button type="button" class="pw-eye" data-eye="acNew" aria-label="Afficher le mot de passe"><i class="fa-solid fa-eye"></i></button></div>
+            <div class="pw-meter" id="pwMeter" hidden><i></i><span></span></div>
+            <span class="err" data-err="newPassword"></span>
+            <div class="hint">Au moins 10 caractères, avec des lettres et des chiffres.</div>
+          </div>
+          <div class="field" id="acConfirmField" hidden>
+            <label for="acConfirm">Confirmer le nouveau mot de passe</label>
+            <div class="pw-wrap"><input id="acConfirm" type="password" autocomplete="new-password" maxlength="200"><button type="button" class="pw-eye" data-eye="acConfirm" aria-label="Afficher le mot de passe"><i class="fa-solid fa-eye"></i></button></div>
+            <span class="err" data-err="confirmPassword"></span>
+          </div>
+          <div class="field account-current">
+            <label for="acCurrent">Mot de passe actuel <span style="text-transform:none; font-weight:500;">(obligatoire pour valider)</span></label>
+            <div class="pw-wrap"><input id="acCurrent" type="password" autocomplete="current-password" maxlength="200"><button type="button" class="pw-eye" data-eye="acCurrent" aria-label="Afficher le mot de passe"><i class="fa-solid fa-eye"></i></button></div>
+            <span class="err" data-err="currentPassword"></span>
+          </div>
+          <div class="account-foot">
+            <button class="btn btn-primary" type="submit" id="acSave"><i class="fa-solid fa-check"></i> Enregistrer les modifications</button>
+          </div>
+        </form>
+        <aside class="card account-info">
+          <h2>Bon à savoir</h2>
+          <ul>
+            <li><i class="fa-solid fa-lock"></i> <span>Ton mot de passe est chiffré dans la base : personne ne peut le lire, pas même toi.</span></li>
+            <li><i class="fa-solid fa-mobile-screen"></i> <span>Tu restes connecté sur cet appareil. Les autres appareils seront déconnectés.</span></li>
+            <li><i class="fa-solid fa-life-ring"></i> <span>Mot de passe oublié ? Dans Vercel, ajoute la variable <code>ADMIN_RESET</code> = <code>1</code> et redéploie : tu pourras te reconnecter avec l'ancien accès (ADMIN_USER / ADMIN_PASSWORD) pour en choisir un nouveau.</span></li>
+          </ul>
+          <p class="account-who">Connecté en tant que <b id="acWho">—</b></p>
+        </aside>
+      </div>
+    </section>
   </main>
 
   <nav class="mobile-tabs">
     <a href="#dashboard" data-view="dashboard"><i class="fa-solid fa-gauge-high"></i> Accueil</a>
     <a href="#creas" data-view="creas"><i class="fa-solid fa-images"></i> Créations</a>
     <a href="#devis" data-view="devis"><i class="fa-solid fa-file-invoice"></i> Devis <span class="count" data-unread hidden></span></a>
+    <a href="#compte" data-view="compte"><i class="fa-solid fa-user-shield"></i> Compte</a>
   </nav>
 </div>
 
@@ -188,6 +240,6 @@
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="js/admin.js?v=202610231724"></script>
+<script src="js/admin.js?v=202610231736"></script>
 </body>
 </html>

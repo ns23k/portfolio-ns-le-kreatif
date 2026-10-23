@@ -789,3 +789,12 @@ html.dark .web-body .cat{color:var(--accent);}
 /* photo seule (coins arrondis) + pointillé doré autour, avec de l'air de chaque côté */
 .avatar-wrap{margin-top:18px;}
 .avatar-ring{display:block; inset:-20px; border-radius:38px;}
+
+/* ---------- Photo : contour blanc 2 px qui suit l'arrondi ---------- */
+.avatar-frame img{
+  width:100%; height:auto; aspect-ratio:594/703; object-fit:cover; object-position:50% 20%;
+  border:2px solid #fff; border-radius:34px; box-sizing:border-box;
+  filter:none; box-shadow:0 22px 40px -18px rgba(0,0,0,.55);
+}
+.avatar-ring{inset:-20px; border-radius:50px;}
+@media (max-width:720px){ .avatar-frame img{border-radius:28px;} .avatar-ring{inset:-16px; border-radius:40px;} }

@@ -8,6 +8,7 @@ const FILTER_LABELS = {
 };
 let works = [];      // portfolio (hors sport)
 let sportWorks = []; // design sport
+let webWorks = [];   // réalisations web
 let featured = [];   // slider d'accueil
 
 async function loadWorks(){
@@ -19,7 +20,8 @@ async function loadWorks(){
     console.warn('API indisponible, affichage de la sélection locale.', e);
     try { list = await (await fetch('js/works-fallback.json')).json(); } catch { list = []; }
   }
-  works = list.filter(w => w.cat !== 'sport');
+  works = list.filter(w => w.cat !== 'sport' && w.cat !== 'web');
+  webWorks = list.filter(w => w.cat === 'web');
   sportWorks = list.filter(w => w.cat === 'sport');
   featured = list.filter(w => w.featured);
   if(!featured.length) featured = works.slice(0, 6);
@@ -28,6 +30,7 @@ async function loadWorks(){
   buildFilters();
   renderGallery('all');
   renderSport();
+  renderWeb();
   startCounter(list.length);
 }
 
@@ -115,6 +118,48 @@ function renderGallery(filter){
 
 const sportGalleryEl = document.getElementById('sportGallery');
 const sportSection = document.getElementById('sport');
+/* ============================================
+   RÉALISATIONS WEB
+============================================ */
+function hostOf(u){ try { return new URL(u).host.replace(/^www\./,''); } catch { return ''; } }
+function renderWeb(){
+  const grid = document.getElementById('webGrid');
+  const section = document.getElementById('web');
+  if(!grid) return;
+  section.hidden = webWorks.length === 0;
+  document.querySelectorAll('a[href="#web"]').forEach(a => (a.closest('li') || a).hidden = webWorks.length === 0);
+  grid.innerHTML = webWorks.map(w => {
+    const host = hostOf(w.link);
+    return `
+    <article class="web-card reveal">
+      <a class="browser" ${w.link ? `href="${NK.esc(w.link)}" target="_blank" rel="noopener"` : ''} aria-label="${NK.esc(w.title)}${w.link ? ' — ouvrir le site' : ''}">
+        <div class="browser-bar"><span class="dots"><i></i><i></i><i></i></span><span class="browser-url"><i class="fa-solid fa-lock"></i> ${NK.esc(host || w.title)}</span></div>
+        <div class="shot"><img src="${NK.esc(w.src)}" alt="Aperçu du site ${NK.esc(w.title)}" loading="lazy" decoding="async"></div>
+      </a>
+      <div class="web-body">
+        <span class="cat">${NK.esc(w.catLabel)}</span>
+        <h3>${NK.esc(w.title)}</h3>
+        ${w.description ? `<p>${NK.esc(w.description)}</p>` : ''}
+        ${w.tags && w.tags.length ? `<ul class="web-tags">${w.tags.map(t => `<li>${NK.esc(t)}</li>`).join('')}</ul>` : ''}
+        ${w.link ? `<a class="btn btn-primary web-link" href="${NK.esc(w.link)}" target="_blank" rel="noopener">Voir le site <i class="fa-solid fa-arrow-up-right-from-square"></i></a>` : `<span class="web-soon"><i class="fa-regular fa-clock"></i> Mise en ligne prochainement</span>`}
+      </div>
+    </article>`;
+  }).join('');
+  grid.querySelectorAll('.web-card').forEach(el => io.observe(el));
+  // défilement du site au survol : hauteur réelle de la capture
+  grid.querySelectorAll('.shot img').forEach(img => {
+    const set = () => {
+      const box = img.parentElement;
+      const dist = Math.max(0, img.getBoundingClientRect().height - box.getBoundingClientRect().height);
+      box.style.setProperty('--scroll', `-${dist}px`);
+      box.style.setProperty('--dur', `${Math.min(14, Math.max(3, dist / 260))}s`);
+      box.classList.toggle('can-scroll', dist > 40);
+    };
+    img.complete ? set() : img.addEventListener('load', set, { once: true });
+    window.addEventListener('resize', set, { passive: true });
+  });
+}
+
 function renderSport(){
   sportGalleryEl.innerHTML = '';
   sportSection.hidden = sportWorks.length === 0;

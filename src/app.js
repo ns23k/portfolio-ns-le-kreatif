@@ -18,9 +18,10 @@ const CATS = {
   brochure: 'Brochure',
   mockup: 'Mockup présentation',
   sport: 'Design sport',
+  web: 'Site web',
 };
 const STATUSES = ['nouveau', 'en_cours', 'devis_envoye', 'accepte', 'refuse', 'termine', 'archive'];
-const PROJECT_TYPES = ['Affiche', 'Logo', 'Carte de visite', 'Brochure', 'Design sport', 'Identité visuelle', 'Photographie', 'Autre'];
+const PROJECT_TYPES = ['Affiche', 'Logo', 'Carte de visite', 'Brochure', 'Design sport', 'Identité visuelle', 'Site web', 'Photographie', 'Autre'];
 const MAX_IMAGE = 3.5 * 1024 * 1024;
 const MIME_OK = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
@@ -61,6 +62,8 @@ function publicWork(w) {
   return {
     id: w.id, title: w.title, cat: w.cat, catLabel: w.cat_label, description: w.description,
     src: w.image_url, featured: !!w.featured,
+    link: w.link_url || null,
+    tags: w.tags ? String(w.tags).split(',').map((t) => t.trim()).filter(Boolean) : [],
   };
 }
 function adminWork(w) {
@@ -239,6 +242,11 @@ function readWork(b, partial = false) {
   if (!partial || 'cat' in b) { out.cat = str(b.cat, 30); if (!CATS[out.cat]) errors.cat = 'Catégorie inconnue.'; }
   if (!partial || 'catLabel' in b) { out.cat_label = str(b.catLabel, 100) || CATS[out.cat || b.cat] || ''; }
   if (!partial || 'description' in b) out.description = str(b.description, 2000) || null;
+  if (!partial || 'link' in b) {
+    out.link_url = str(b.link, 500) || null;
+    if (out.link_url && !/^https?:\/\/[^\s]+\.[^\s]+/.test(out.link_url)) errors.link = 'Lien invalide (doit commencer par https://).';
+  }
+  if (!partial || 'tags' in b) out.tags = str(Array.isArray(b.tags) ? b.tags.join(', ') : b.tags, 300) || null;
   if (!partial || 'src' in b) {
     out.image_url = str(b.src, 500);
     if (!/^(\/images\/|\/api\/media\/\d+$|https:\/\/)/.test(out.image_url)) errors.src = 'Image requise.';

@@ -176,7 +176,7 @@ function qItem(q){
 /* ============================================
    CRÉATIONS
 ============================================ */
-const CAT_NAMES = { affiche:'Affiches', logo:'Logos', carte:'Cartes de visite', brochure:'Brochures', mockup:'Mockups & Branding', sport:'Design sport' };
+const CAT_NAMES = { affiche:'Affiches', logo:'Logos', carte:'Cartes de visite', brochure:'Brochures', mockup:'Mockups & Branding', sport:'Design sport', web:'Réalisations web' };
 const catName = (k) => CAT_NAMES[k] || state.categories[k] || k;
 
 function fillCatSelect(){
@@ -221,7 +221,7 @@ function renderWorks(){
     return;
   }
   $('#wgrid').innerHTML = list.map(w => `
-    <article class="wcard ${w.published ? '' : 'hidden-work'} ${['logo','carte'].includes(w.cat) ? 'is-logo' : ''} ${w.cat === 'carte' ? 'is-carte' : ''} ${w.cat === 'mockup' ? 'is-mockup' : ''}" data-id="${w.id}">
+    <article class="wcard ${w.published ? '' : 'hidden-work'} ${['logo','carte'].includes(w.cat) ? 'is-logo' : ''} ${w.cat === 'carte' ? 'is-carte' : ''} ${w.cat === 'web' ? 'is-web' : ''} ${w.cat === 'mockup' ? 'is-mockup' : ''}" data-id="${w.id}">
       <div class="wthumb" data-edit style="--img:url('${esc(w.src)}')">
         <img src="${esc(w.src)}" alt="" loading="lazy">
         <div class="wbadges">
@@ -347,6 +347,10 @@ function openWork(w = null){
   $('#wlabel').value = w?.catLabel || state.categories[$('#wcat').value] || '';
   $('#wlabel').dataset.auto = w ? '' : '1';
   $('#wdesc').value = w?.description || '';
+  $('#wlink').value = w?.link || '';
+  $('#wtags').value = (w?.tags || []).join(', ');
+  $('#wlink').closest('.field').classList.remove('invalid');
+  toggleWebFields();
   $('#wpub').checked = w ? w.published : true;
   $('#wfeat').checked = w ? w.featured : false;
   $('#uplInfo').textContent = "L'image est optimisée automatiquement avant l'envoi.";
@@ -356,7 +360,28 @@ function openWork(w = null){
   setTimeout(() => (w ? $('#wtitle') : $('#drop')).focus(), 30);
 }
 
-$('#wcat').addEventListener('change', () => { if($('#wlabel').dataset.auto) $('#wlabel').value = state.categories[$('#wcat').value] || ''; });
+$('#wcat').addEventListener('change', () => { if($('#wlabel').dataset.auto) $('#wlabel').value = state.categories[$('#wcat').value] || ''; toggleWebFields(); });
+
+/* ----- réalisations web : lien, technologies, capture automatique ----- */
+function toggleWebFields(){ $('#webFields').hidden = $('#wcat').value !== 'web'; }
+const isUrl = (u) => /^https?:\/\/[^\s]+\.[^\s]+/.test(u);
+function shotUrl(site){
+  return 'https://api.microlink.io/?url=' + encodeURIComponent(site)
+    + '&screenshot=true&screenshot.fullPage=true&screenshot.type=jpeg&meta=false&embed=screenshot.url'
+    + '&viewport.width=1280&viewport.height=800&viewport.deviceScaleFactor=1&waitForTimeout=1500';
+}
+$('#wshot').addEventListener('click', () => {
+  const link = $('#wlink').value.trim();
+  const ok = isUrl(link);
+  $('#wlink').closest('.field').classList.toggle('invalid', !ok);
+  if(!ok){ $('#wlink').focus(); return; }
+  pendingBlob = null; currentSrc = shotUrl(link);
+  $('#uplInfo').textContent = 'Capture en cours… (quelques secondes la première fois)';
+  setPreview(currentSrc);
+  const img = $('#drop img');
+  img.addEventListener('load', () => { $('#uplInfo').textContent = 'Capture du site prête ✓ (page entière, mise à jour automatique)'; }, { once:true });
+  img.addEventListener('error', () => { $('#uplInfo').textContent = "Capture impossible pour ce lien — ajoute plutôt une image toi-même."; }, { once:true });
+});
 $('#wlabel').addEventListener('input', () => { $('#wlabel').dataset.auto = ''; });
 
 /* compression côté navigateur : max 1800 px, JPEG (ou PNG si transparence possible) */
@@ -405,6 +430,12 @@ drop.addEventListener('drop', (e) => { e.preventDefault(); pickFile(e.dataTransf
 $('#workForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   const title = $('#wtitle').value.trim();
+  const isWeb = $('#wcat').value === 'web';
+  const link = isWeb ? $('#wlink').value.trim() : '';
+  const okLink = !link || isUrl(link);
+  $('#wlink').closest('.field').classList.toggle('invalid', !okLink);
+  if(!okLink) return;
+  if(isWeb && !pendingBlob && !currentSrc && link) currentSrc = shotUrl(link); // capture auto si pas d'image
   const okTitle = title.length >= 2, okImg = !!(pendingBlob || currentSrc);
   $('#wtitle').closest('.field').classList.toggle('invalid', !okTitle);
   $('#drop').classList.toggle('invalid', !okImg);
@@ -422,6 +453,8 @@ $('#workForm').addEventListener('submit', async (e) => {
     const payload = {
       title, cat: $('#wcat').value, catLabel: $('#wlabel').value.trim(), description: $('#wdesc').value.trim(),
       src, published: $('#wpub').checked, featured: $('#wfeat').checked,
+      link: isWeb ? (link || null) : null,
+      tags: isWeb ? $('#wtags').value.trim() : null,
     };
     if(editing){
       const { work } = await api(`/api/admin/works/${editing.id}`, {method:'PUT', body: JSON.stringify(payload)});

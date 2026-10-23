@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="css/admin.css?v=202610231658">
+<link rel="stylesheet" href="css/admin.css?v=202610231719">
 <script>try{var t=localStorage.getItem('nk-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}</script>
 </head>
 <body>
@@ -160,6 +160,19 @@
           <label for="wdesc">Description <span style="text-transform:none; font-weight:500;">(facultatif, visible quand on agrandit)</span></label>
           <textarea id="wdesc" maxlength="2000" placeholder="Client, contexte, outils utilisés…" style="min-height:80px"></textarea>
         </div>
+        <div id="webFields" hidden>
+          <div class="field">
+            <label for="wlink">Lien du site</label>
+            <input id="wlink" type="url" inputmode="url" maxlength="500" placeholder="https://monsite.com">
+            <span class="err" id="wlinkErr">Lien invalide (doit commencer par https://).</span>
+            <div class="hint">Laisse vide si le site n'est pas encore en ligne : la carte affichera « Mise en ligne prochainement ».</div>
+          </div>
+          <div class="field">
+            <label for="wtags">Technologies <span style="text-transform:none; font-weight:500;">(séparées par des virgules)</span></label>
+            <input id="wtags" maxlength="300" placeholder="Ex. PHP, MySQL, JavaScript">
+          </div>
+          <button type="button" class="btn btn-ghost btn-sm" id="wshot" style="margin:-4px 0 16px;"><i class="fa-solid fa-camera"></i> Capturer le site automatiquement</button>
+        </div>
         <div style="display:grid; gap:10px;">
           <label class="toggle"><input type="checkbox" id="wpub" checked><span><b>Publiée</b><small>Visible sur le site</small></span></label>
           <label class="toggle"><input type="checkbox" id="wfeat"><span><b>Mettre en avant</b><small>Apparaît dans le slider de l'accueil</small></span></label>
@@ -175,6 +188,6 @@
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="js/admin.js?v=202610231658"></script>
+<script src="js/admin.js?v=202610231719"></script>
 </body>
 </html>

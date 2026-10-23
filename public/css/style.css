@@ -764,3 +764,18 @@ html.dark .web-body .cat{color:var(--accent);}
   .nav-links{display:none;}
   .burger{display:flex;}
 }
+
+/* ---------- Bouton « Voir le site » : plus compact + halo animé ---------- */
+.web-link{
+  position:relative; align-self:flex-start;
+  padding:8px 15px; font-size:13px; gap:7px; font-weight:500;
+  animation:webHalo 2.8s ease-in-out infinite;
+}
+.web-link i{font-size:11px;}
+.web-link:hover{animation-play-state:paused; box-shadow:0 0 0 5px color-mix(in srgb, var(--brand) 22%, transparent);}
+@keyframes webHalo{
+  0%, 100%{box-shadow:0 0 0 0 color-mix(in srgb, var(--brand) 45%, transparent);}
+  60%{box-shadow:0 0 0 9px color-mix(in srgb, var(--brand) 0%, transparent);}
+}
+@media (max-width:720px){ .web-link{align-self:flex-start; justify-content:flex-start;} }
+@media (prefers-reduced-motion: reduce){ .web-link{animation:none;} }

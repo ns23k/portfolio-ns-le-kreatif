@@ -591,3 +591,12 @@ h1, h2, h3, h4{font-family:var(--font-title); letter-spacing:.01em;}
 .mark{background:none; padding:0; color:var(--brand);}
 html.dark .mark{color:var(--accent);}
 .hero h1 .mark, .track-hero h1 .mark, .quote-left .mark{color:var(--accent);}
+
+/* ---------- Titres en Bodoni Moda (remplace Cinzel) ---------- */
+:root{ --font-title:'Bodoni Moda', 'Didot', 'Bodoni 72', Georgia, serif; }
+h1, h2, h3, h4, .service-card h3{font-family:var(--font-title); letter-spacing:-.005em;}
+.hero h1{font-size:clamp(38px,5.2vw,64px); font-weight:800; line-height:1.06;}
+.track-hero h1{font-size:clamp(32px,4.8vw,52px); font-weight:800; line-height:1.08;}
+.section-head h2, .about-text h2, .quote-left h2{font-weight:800; line-height:1.12;}
+.service-card h3{font-size:22px; font-weight:800; letter-spacing:0;}
+.mark{font-style:italic;}

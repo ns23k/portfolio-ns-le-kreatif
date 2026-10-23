@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ns_le Kréatif — Portfolio Graphisme &amp; Design</title>
+<meta name="description" content="Portfolio de Ns_le Kréatif — Création d'affiches, logos, cartes de visite et brochures.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header>
+  <nav>
+    <a href="#home" class="logo">ns_le<span> kréatif</span></a>
+    <ul class="nav-links">
+      <li><a href="#home">Accueil</a></li>
+      <li><a href="#about">À propos</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#sport">Design Sport</a></li>
+      <li><a href="#contact">Devis</a></li>
+      <li><a href="suivi.html">Suivi devis</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer de thème"><i class="fa-solid fa-moon"></i></button>
+      <button class="burger" id="burgerBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </nav>
+</header>
+
+<div class="overlay" id="overlay"></div>
+<div class="mobile-drawer" id="drawer">
+  <button class="drawer-close" id="drawerClose"><i class="fa-solid fa-xmark"></i></button>
+  <a href="#home">Accueil</a>
+  <a href="#about">À propos</a>
+  <a href="#services">Services</a>
+  <a href="#portfolio">Portfolio</a>
+  <a href="#sport">Design Sport</a>
+  <a href="#contact">Devis</a>
+  <a href="suivi.html">Suivi de mon devis</a>
+</div>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="home">
+  <div class="container hero-grid">
+    <div>
+      <div class="eyebrow"><i class="fa-solid fa-pen-nib"></i> Étudiant en infographie</div>
+      <h1>Je transforme des idées en <span class="mark">identités visuelles</span> mémorables.</h1>
+      <p class="lead">Affiches d'événements, logos, cartes de visite et brochures — un design pensé pour capter l'attention et raconter une histoire, du brief au fichier final.</p>
+      <div class="hero-cta">
+        <a href="#contact" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Demander un devis</a>
+        <a href="#portfolio" class="btn btn-ghost"><i class="fa-solid fa-images"></i> Voir le portfolio</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong id="statProjects">0</strong><span>Projets réalisés</span></div>
+        <div><strong>4</strong><span>Domaines de création</span></div>
+        <div><strong>100%</strong><span>Sur-mesure</span></div>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="stage-bg"></div>
+      <div class="badge-float"><i class="fa-solid fa-star"></i> Design original</div>
+      <div class="slider" id="heroSlider"></div>
+      <button class="slider-nav prev" id="sliderPrev"><i class="fa-solid fa-chevron-left"></i></button>
+      <button class="slider-nav next" id="sliderNext"><i class="fa-solid fa-chevron-right"></i></button>
+      <div class="slider-dots" id="sliderDots"></div>
+    </div>
+  </div>
+</section>
+
+<div class="marquee-wrap">
+  <div class="marquee">
+    <span><i class="fa-solid fa-star"></i> Affiches</span>
+    <span><i class="fa-solid fa-star"></i> Logos</span>
+    <span><i class="fa-solid fa-star"></i> Cartes de visite</span>
+    <span><i class="fa-solid fa-star"></i> Brochures</span>
+    <span><i class="fa-solid fa-star"></i> Mockups</span>
+    <span><i class="fa-solid fa-star"></i> Affiches</span>
+    <span><i class="fa-solid fa-star"></i> Logos</span>
+    <span><i class="fa-solid fa-star"></i> Cartes de visite</span>
+    <span><i class="fa-solid fa-star"></i> Brochures</span>
+    <span><i class="fa-solid fa-star"></i> Mockups</span>
+  </div>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<section id="about">
+  <div class="container about-grid">
+    <div class="avatar-wrap reveal">
+      <div class="avatar-ring"></div>
+      <div class="avatar-frame">
+        <img src="images/profile_niaye.jpg" alt="Niaye Sall" style="display:block;">
+      </div>
+      <div class="avatar-tag"><i class="fa-solid fa-location-dot"></i> Saint-Louis, Sénégal</div>
+    </div>
+    <div class="about-text reveal">
+      <div class="eyebrow"><i class="fa-solid fa-user"></i> À propos</div>
+      <h2>Le graphisme, ma manière de <span class="mark">raconter</span>.</h2>
+      <p>Je m'appelle <strong>Niaye Sall</strong>, étudiant en infographie à l'Université Gaston Berger de Saint-Louis. Je transforme les idées en visuels. Actuellement en troisième année de licence, je construis mon univers entre créativité, esthétique et message, avec une envie constante d'innover et de raconter des histoires à travers le design, la vidéo et la 3D.</p>
+      <p style="margin-bottom:8px;"><strong>Formation</strong></p>
+      <p style="margin-bottom:6px;">Licence Infographie — Université Gaston Berger de Saint-Louis <span style="color:var(--muted);">(2023 – en cours)</span></p>
+      <p style="margin-bottom:6px;">Formation en Graphisme — 90 jours pour être bon en graphisme <span style="color:var(--muted);">(avril – juin 2025)</span></p>
+      <p>Baccalauréat série littéraire (L2) — Lycée Ababacar Sy de Tivaouane <span style="color:var(--muted);">(2022–2023)</span></p>
+      <div class="skills">
+        <div class="skill-row"><span>Illustrator <b>92%</b></span><div class="skill-bar"><i data-w="92"></i></div></div>
+        <div class="skill-row"><span>Photoshop <b>90%</b></span><div class="skill-bar"><i data-w="90"></i></div></div>
+        <div class="skill-row"><span>InDesign <b>82%</b></span><div class="skill-bar"><i data-w="82"></i></div></div>
+        <div class="skill-row"><span>Premiere Pro <b>78%</b></span><div class="skill-bar"><i data-w="78"></i></div></div>
+        <div class="skill-row"><span>After Effects <b>75%</b></span><div class="skill-bar"><i data-w="75"></i></div></div>
+        <div class="skill-row"><span>XD <b>80%</b></span><div class="skill-bar"><i data-w="80"></i></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SERVICES ============ -->
+<section id="services" style="background:var(--surface-2);">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow"><i class="fa-solid fa-layer-group"></i> Ce que je fais</div>
+      <h2>Des créations pensées pour chaque support</h2>
+      <p>De l'affiche événementielle à la brochure institutionnelle, chaque format a ses propres règles — je les connais.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card reveal">
+        <span class="service-num">01</span>
+        <div class="service-icon"><i class="fa-solid fa-image"></i></div>
+        <h3>Affiches</h3>
+        <p>Affiches d'événements, campagnes et annonces pensées pour capter l'œil en un coup d'œil.</p>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-num">02</span>
+        <div class="service-icon"><i class="fa-solid fa-shapes"></i></div>
+        <h3>Logos</h3>
+        <p>Identités visuelles simples, mémorables et déclinables sur tous vos supports.</p>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-num">03</span>
+        <div class="service-icon"><i class="fa-solid fa-id-card"></i></div>
+        <h3>Cartes de visite</h3>
+        <p>Des cartes soignées qui laissent une vraie impression dès le premier contact.</p>
+      </div>
+      <div class="service-card reveal">
+        <span class="service-num">04</span>
+        <div class="service-icon"><i class="fa-solid fa-book-open"></i></div>
+        <h3>Brochures</h3>
+        <p>Supports imprimés clairs et structurés, pour présenter une offre ou une structure.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PORTFOLIO ============ -->
+<section id="portfolio">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow"><i class="fa-solid fa-briefcase"></i> Portfolio</div>
+      <h2>Une sélection de <span class="mark">projets réalisés</span></h2>
+      <p>Affiches d'événements et mockups de présentation — cliquez sur un visuel pour l'agrandir.</p>
+    </div>
+    <div class="filters" id="filters"></div>
+    <div class="gallery" id="gallery"><div class="gallery-loading">Chargement des créations…</div></div>
+  </div>
+</section>
+
+<!-- ============ SPORT DESIGN ============ -->
+<section id="sport" style="background:var(--surface-2);">
+  <div class="container">
+    <div class="section-head reveal">
+      <div class="eyebrow"><i class="fa-solid fa-futbol"></i> Design Sport</div>
+      <h2>Affiches et créas <span class="mark">sport</span></h2>
+      <p>Affiches de matchs, hommages joueurs et visuels d'actualité sportive — un registre plus dynamique, pensé pour les réseaux sociaux.</p>
+    </div>
+    <div class="gallery" id="sportGallery"></div>
+  </div>
+</section>
+
+<!-- ============ LIGHTBOX ============ -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lightboxClose"><i class="fa-solid fa-xmark"></i></button>
+    <img alt="" id="lightboxImg" hidden>
+    <div class="lightbox-info">
+      <span class="cat" id="lightboxCat"></span>
+      <h3 id="lightboxTitle"></h3>
+      <p id="lightboxDesc" class="lightbox-desc"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ============ QUOTE / CONTACT ============ -->
+<section id="contact">
+  <div class="container">
+    <div class="quote-wrap reveal">
+      <div class="quote-grid">
+        <div class="quote-left">
+          <div class="eyebrow"><i class="fa-solid fa-comments"></i> Discutons</div>
+          <h2>Un projet en tête ? Demandez votre devis.</h2>
+          <p>Décrivez votre besoin — affiche, logo, carte de visite ou brochure — et je reviens vers vous rapidement avec une proposition.</p>
+          <div class="quote-contact">
+            <a href="tel:+221785863668"><i class="fa-solid fa-phone"></i> +221 78 58 63 668</a>
+            <a href="mailto:etudeetudiant123@gmail.com"><i class="fa-solid fa-envelope"></i> etudeetudiant123@gmail.com</a>
+            <a href="#"><i class="fa-solid fa-location-dot"></i> Saint-Louis, Sénégal</a>
+          </div>
+          <div class="quote-social">
+            <a href="https://instagram.com/ns_le_kreatif" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+            <a href="#" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+            <a href="#" aria-label="Behance"><i class="fa-brands fa-behance"></i></a>
+          </div>
+        </div>
+
+        <form class="form-card" id="quoteForm" novalidate>
+          <div class="form-row">
+            <div class="field">
+              <label for="fname">Nom complet</label>
+              <input type="text" id="fname" name="fname" placeholder="Votre nom">
+              <span class="err">Veuillez indiquer votre nom.</span>
+            </div>
+            <div class="field">
+              <label for="femail">Email</label>
+              <input type="email" id="femail" name="femail" placeholder="vous@email.com">
+              <span class="err">Adresse email invalide.</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="fphone">Téléphone</label>
+              <input type="tel" id="fphone" name="fphone" placeholder="+221 77 000 00 00">
+              <span class="err">Numéro invalide.</span>
+            </div>
+            <div class="field">
+              <label for="ftype">Type de projet</label>
+              <select id="ftype" name="ftype">
+                <option value="">Choisir…</option>
+                <option value="Affiche">Affiche</option>
+                <option value="Logo">Logo</option>
+                <option value="Carte de visite">Carte de visite</option>
+                <option value="Brochure">Brochure</option>
+                <option value="Design sport">Design sport</option>
+                <option value="Identité visuelle">Identité visuelle complète</option>
+                <option value="Photographie">Photographie</option>
+                <option value="Autre">Autre</option>
+              </select>
+              <span class="err">Merci de choisir un type de projet.</span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="field">
+              <label for="fbudget">Budget indicatif <em>(facultatif)</em></label>
+              <select id="fbudget" name="fbudget">
+                <option value="">Je ne sais pas encore</option>
+                <option value="Moins de 15 000 F CFA">Moins de 15 000 F CFA</option>
+                <option value="15 000 – 50 000 F CFA">15 000 – 50 000 F CFA</option>
+                <option value="50 000 – 150 000 F CFA">50 000 – 150 000 F CFA</option>
+                <option value="Plus de 150 000 F CFA">Plus de 150 000 F CFA</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="fdeadline">Délai souhaité <em>(facultatif)</em></label>
+              <select id="fdeadline" name="fdeadline">
+                <option value="">Pas pressé</option>
+                <option value="Urgent (48 h)">Urgent (48 h)</option>
+                <option value="Cette semaine">Cette semaine</option>
+                <option value="Sous 2 semaines">Sous 2 semaines</option>
+                <option value="Dans le mois">Dans le mois</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label for="fmsg">Décrivez votre projet</label>
+            <textarea id="fmsg" name="fmsg" placeholder="Parlez-moi de votre besoin, du format souhaité, des textes à intégrer…"></textarea>
+            <span class="err">Merci de décrire brièvement votre projet (10 caractères min).</span>
+          </div>
+          <div class="hp" aria-hidden="true"><label>Site web <input type="text" id="fwebsite" tabindex="-1" autocomplete="off"></label></div>
+          <button type="submit" class="btn btn-primary form-submit" id="formSubmit"><i class="fa-solid fa-paper-plane"></i> Envoyer la demande</button>
+          <div class="form-error" id="formError"></div>
+        </form>
+        <div class="form-card form-done" id="formDone" hidden>
+          <div class="done-icon"><i class="fa-solid fa-circle-check"></i></div>
+          <h3>Demande bien reçue&nbsp;!</h3>
+          <p>Je reviens vers vous rapidement avec une proposition. Gardez votre code de suivi pour consulter ma réponse et le prix&nbsp;:</p>
+          <div class="done-code" id="doneCode">NK-XXXXXX</div>
+          <p class="done-note" id="doneNote"></p>
+          <div class="done-actions">
+            <a class="btn btn-primary" id="doneTrack" href="suivi.html"><i class="fa-solid fa-magnifying-glass"></i> Suivre ma demande</a>
+            <button class="btn btn-ghost-dark" id="doneAgain" type="button">Nouvelle demande</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <a href="#home" class="logo">ns_le<span> kréatif</span></a>
+      <div class="footer-social">
+        <a href="https://instagram.com/ns_le_kreatif" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="mailto:etudeetudiant123@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="tel:+221785863668" aria-label="Téléphone"><i class="fa-solid fa-phone"></i></a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Ns_le Kréatif. Tous droits réservés.</span>
+      <span>Design &amp; développement par Ns_le Kréatif</span>
+    </div>
+  </div>
+</footer>
+
+<button id="toTop" aria-label="Retour en haut"><i class="fa-solid fa-arrow-up"></i></button>
+
+<script src="js/common.js"></script>
+<script src="js/script.js"></script>
+</body>
+</html>

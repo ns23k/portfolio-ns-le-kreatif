@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Ns_le Kréatif</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/admin.css">
+<script>try{var t=localStorage.getItem('nk-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}</script>
+</head>
+<body>
+
+<!-- ============ CONNEXION ============ -->
+<div class="login" id="loginView" hidden>
+  <form class="login-card" id="loginForm" novalidate>
+    <a href="index.html" class="logo">ns_le<span> kréatif</span></a>
+    <h1>Espace administrateur</h1>
+    <p>Gère tes créations et réponds aux demandes de devis.</p>
+    <div class="field">
+      <label for="luser">Identifiant</label>
+      <input id="luser" autocomplete="username" value="admin">
+    </div>
+    <div class="field" id="lpassField">
+      <label for="lpass">Mot de passe</label>
+      <input id="lpass" type="password" autocomplete="current-password">
+      <span class="err" id="lerr">Identifiant ou mot de passe incorrect.</span>
+    </div>
+    <button class="btn btn-primary" type="submit" id="lbtn"><i class="fa-solid fa-right-to-bracket"></i> Se connecter</button>
+    <a class="back" href="index.html"><i class="fa-solid fa-arrow-left"></i> Retour au site</a>
+  </form>
+</div>
+
+<!-- ============ APPLICATION ============ -->
+<div class="app" id="appView" hidden>
+  <aside class="side">
+    <a href="#dashboard" class="logo">ns_le<span> kréatif</span></a>
+    <nav>
+      <a href="#dashboard" data-view="dashboard"><i class="fa-solid fa-gauge-high"></i> Tableau de bord</a>
+      <a href="#creas" data-view="creas"><i class="fa-solid fa-images"></i> Créations</a>
+      <a href="#devis" data-view="devis"><i class="fa-solid fa-file-invoice"></i> Devis <span class="count" data-unread hidden></span></a>
+    </nav>
+    <div class="side-foot">
+      <a href="index.html" target="_blank" rel="noopener"><i class="fa-solid fa-arrow-up-right-from-square"></i> Voir le site</a>
+      <button type="button" data-theme-toggle><i class="fa-solid fa-circle-half-stroke"></i> Thème clair / sombre</button>
+      <button type="button" data-logout><i class="fa-solid fa-right-from-bracket"></i> Déconnexion</button>
+    </div>
+  </aside>
+
+  <div class="mobile-bar">
+    <a href="#dashboard" class="logo">ns_le<span> kréatif</span></a>
+    <div style="display:flex; gap:8px;">
+      <a class="icon-btn" href="index.html" target="_blank" rel="noopener" aria-label="Voir le site"><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+      <button class="icon-btn" type="button" data-theme-toggle aria-label="Thème"><i class="fa-solid fa-circle-half-stroke"></i></button>
+      <button class="icon-btn" type="button" data-logout aria-label="Déconnexion"><i class="fa-solid fa-right-from-bracket"></i></button>
+    </div>
+  </div>
+
+  <main class="main">
+    <!-- tableau de bord -->
+    <section data-section="dashboard" hidden>
+      <div class="topbar">
+        <div><h1 id="hello">Bonjour 👋</h1><p>Voici ce qui se passe sur ton portfolio.</p></div>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button class="btn btn-gold" type="button" data-new-work><i class="fa-solid fa-plus"></i> Ajouter une créa</button>
+        </div>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat skel" style="height:104px"></div><div class="stat skel" style="height:104px"></div>
+        <div class="stat skel" style="height:104px"></div><div class="stat skel" style="height:104px"></div>
+      </div>
+      <div class="dash-grid">
+        <div class="card"><h2>Dernières demandes <a href="#devis">Tout voir →</a></h2><div class="qlist" id="recent"></div></div>
+        <div class="card"><h2>Créations par catégorie <a href="#creas">Gérer →</a></h2><div class="bars" id="catBars"></div></div>
+      </div>
+    </section>
+
+    <!-- créations -->
+    <section data-section="creas" hidden>
+      <div class="topbar">
+        <div><h1>Créations</h1><p id="worksSummary">—</p></div>
+        <button class="btn btn-gold" type="button" data-new-work><i class="fa-solid fa-plus"></i> Ajouter une créa</button>
+      </div>
+      <div class="chips" id="catChips"></div>
+      <div class="toolbar">
+        <input class="input" id="wsearch" type="search" placeholder="Rechercher une création…">
+        <select class="input" id="wvis">
+          <option value="">Toutes</option>
+          <option value="pub">Publiées</option>
+          <option value="hid">Masquées</option>
+          <option value="star">Dans le slider</option>
+        </select>
+      </div>
+      <div class="hint-bar" id="dragHint"><i class="fa-solid fa-grip-vertical"></i> Glisse les cartes avec la poignée pour changer l'ordre d'affichage sur le site.</div>
+      <div class="wgrid" id="wgrid"></div>
+    </section>
+
+    <!-- devis -->
+    <section data-section="devis" hidden>
+      <div class="topbar">
+        <div><h1>Demandes de devis</h1><p id="quotesSummary">—</p></div>
+      </div>
+      <div class="qsplit" id="qsplit">
+        <div class="card qside">
+          <input class="input" id="qsearch" type="search" placeholder="Nom, email, code…">
+          <div class="chips" id="qchips" style="margin-bottom:10px;"></div>
+          <div class="qlist" id="qlist"></div>
+        </div>
+        <div class="card qdetail" id="qdetail">
+          <div class="empty"><i class="fa-solid fa-file-invoice"></i>Sélectionne une demande pour la lire et y répondre.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="mobile-tabs">
+    <a href="#dashboard" data-view="dashboard"><i class="fa-solid fa-gauge-high"></i> Accueil</a>
+    <a href="#creas" data-view="creas"><i class="fa-solid fa-images"></i> Créations</a>
+    <a href="#devis" data-view="devis"><i class="fa-solid fa-file-invoice"></i> Devis <span class="count" data-unread hidden></span></a>
+  </nav>
+</div>
+
+<!-- ============ MODALE CRÉATION ============ -->
+<dialog id="workDlg">
+  <form id="workForm" novalidate>
+    <div class="dlg-head">
+      <h2 id="workDlgTitle">Nouvelle création</h2>
+      <button class="icon-btn" type="button" data-close aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="dlg-body">
+      <div>
+        <label class="drop" id="drop" for="wfile">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <b>Choisir une image</b>
+          <small>ou glisse-la ici · JPG, PNG, WEBP</small>
+        </label>
+        <input type="file" id="wfile" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+        <div class="upl" id="uplInfo">L'image est optimisée automatiquement avant l'envoi.</div>
+      </div>
+      <div>
+        <div class="field">
+          <label for="wtitle">Titre</label>
+          <input id="wtitle" maxlength="200" placeholder="Ex. Cultur'Ailes — Lancement officiel">
+          <span class="err">Donne un titre à la créa.</span>
+        </div>
+        <div class="row2">
+          <div class="field">
+            <label for="wcat">Catégorie</label>
+            <select id="wcat"></select>
+          </div>
+          <div class="field">
+            <label for="wlabel">Libellé affiché</label>
+            <input id="wlabel" maxlength="100" placeholder="Affiche évènement">
+          </div>
+        </div>
+        <div class="field">
+          <label for="wdesc">Description <span style="text-transform:none; font-weight:500;">(facultatif, visible quand on agrandit)</span></label>
+          <textarea id="wdesc" maxlength="2000" placeholder="Client, contexte, outils utilisés…" style="min-height:80px"></textarea>
+        </div>
+        <div style="display:grid; gap:10px;">
+          <label class="toggle"><input type="checkbox" id="wpub" checked><span><b>Publiée</b><small>Visible sur le site</small></span></label>
+          <label class="toggle"><input type="checkbox" id="wfeat"><span><b>Mettre en avant</b><small>Apparaît dans le slider de l'accueil</small></span></label>
+        </div>
+      </div>
+    </div>
+    <div class="dlg-foot">
+      <button class="btn btn-ghost" type="button" data-close>Annuler</button>
+      <button class="btn btn-primary" type="submit" id="wsave"><i class="fa-solid fa-check"></i> Enregistrer</button>
+    </div>
+  </form>
+</dialog>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

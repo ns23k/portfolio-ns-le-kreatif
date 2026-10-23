@@ -1,0 +1,21 @@
+{
+  "name": "ns-le-kreatif",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Portfolio Ns_le Kréatif — site public, espace admin (créas + devis), API Node/Express sur MySQL (TiDB Cloud)",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "db:init": "node scripts/init-db.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "mysql2": "^3.11.5",
+    "nodemailer": "^6.9.16"
+  }
+}

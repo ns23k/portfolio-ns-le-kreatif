@@ -1,0 +1,401 @@
+[
+ {
+  "title": "96h d'Int'Act — Teaser",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_96h_d_intAct_de_la_promo_P35_36.jpg",
+  "featured": 1
+ },
+ {
+  "title": "Tournoi du Capitaine — Finale",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_Challence_FINAL.jpg",
+  "featured": 1
+ },
+ {
+  "title": "Tournoi du Capitaine — Annonce",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_Challence_2_FINAL.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Dîner d'Intégration",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_DINER.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Dox'and Gëstu — Itinéraire",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_Dox_And_Gestu.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Tournoi du Capitaine — Match",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_FINAL.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Guddi Ajjuma",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_GA.jpg",
+  "featured": 0
+ },
+ {
+  "title": "96h d'Int'Act — Thème central",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_OFF.jpg",
+  "featured": 0
+ },
+ {
+  "title": "96h d'Int'Act — Programme",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_presentation.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Xadaratul Jumma",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_XA.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Yendu Action Sociale",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_Yendu_AS.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Amicale des Encadreurs",
+  "cat": "mockup",
+  "cat_label": "Mockup présentation",
+  "image_url": "images/Amicale_des_encadreurs_jpg_.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Champions d'Afrique — Match Amical",
+  "cat": "mockup",
+  "cat_label": "Mockup présentation",
+  "image_url": "images/Amicale.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Tournoi Cube 2025 — Binou Fall",
+  "cat": "mockup",
+  "cat_label": "Mockup présentation",
+  "image_url": "images/bINOU_fAll.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Noppi Teey Mandu — Couverture",
+  "cat": "mockup",
+  "cat_label": "Mockup présentation",
+  "image_url": "images/Cover.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Noppi Teey Mandu — Édition",
+  "cat": "mockup",
+  "cat_label": "Mockup présentation",
+  "image_url": "images/Cover_.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Vente de Dattes — Flyer",
+  "cat": "mockup",
+  "cat_label": "Mockup présentation",
+  "image_url": "images/ctc.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Cultur'Ailes — Chronogramme",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_CulturAiles_Chronogramme.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Cultur'Ailes — Lancement officiel",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_CulturAiles_Lancement.jpg",
+  "featured": 1
+ },
+ {
+  "title": "Coupe Lamina Thiandoum",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_Tournoi_Lamina.jpg",
+  "featured": 1
+ },
+ {
+  "title": "Elite School — Fête de l'Indépendance",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_Independance_EliteSchool.jpg",
+  "featured": 0
+ },
+ {
+  "title": "66 ans d'Indépendance",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_Independance_66ans.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Cinéma en Plein Air — Teaser",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_Cinema_Teaser.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Soirée Cinéma en Plein Air",
+  "cat": "affiche",
+  "cat_label": "Affiche évènement",
+  "image_url": "images/AFF_Cinema_Soiree.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Poissonnerie d'Al Mourchid — Flyer",
+  "cat": "affiche",
+  "cat_label": "Affiche / Flyer",
+  "image_url": "images/Flyer_Poissonnerie.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Poissonnerie d'Al Mourchid — Carte de visite",
+  "cat": "carte",
+  "cat_label": "Carte de visite",
+  "image_url": "images/Carte_Poissonnerie.jpg",
+  "featured": 1
+ },
+ {
+  "title": "Mir Aat — Logo",
+  "cat": "logo",
+  "cat_label": "Logo",
+  "image_url": "images/Logo_MirAat.jpg",
+  "featured": 1
+ },
+ {
+  "title": "L'Kella — Logo bordeaux",
+  "cat": "logo",
+  "cat_label": "Logo",
+  "image_url": "images/Logo_Kella_Bordeaux.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Logo blanc",
+  "cat": "logo",
+  "cat_label": "Logo",
+  "image_url": "images/Logo_Kella_Blanc.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Orthéga Couture — Logo",
+  "cat": "logo",
+  "cat_label": "Logo",
+  "image_url": "images/Logo_Orthega.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Car & Costum — Logo",
+  "cat": "logo",
+  "cat_label": "Logo",
+  "image_url": "images/Logo_CarCostum.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Orthéga Couture — Mockup de présentation",
+  "cat": "mockup",
+  "cat_label": "Mockup présentation",
+  "image_url": "images/Identite_Orthega_Mockup.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Papeterie de marque",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Stationery.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Tube bordeaux",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Tube_Rouge.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Tube bleu",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Tube_Bleu.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Déclinaison orange",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Tubes_Box_Orange.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Tube et coffret",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Tube_Box_Orange.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Duo de tubes",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Duo_Tubes.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Trio coloris",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Trio_Tubes.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Pot texture ouvert",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Pot_Ouvert.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Pot crème",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Pot_Creme.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Pot rond fermé",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Pot_Rond.jpg",
+  "featured": 0
+ },
+ {
+  "title": "L'Kella — Porte-clé cuir",
+  "cat": "mockup",
+  "cat_label": "Mockup packaging",
+  "image_url": "images/Kella_Porte_Cle.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Sénégal vs Égypte — Les Lions de la Teranga",
+  "cat": "sport",
+  "cat_label": "Affiche match CAN",
+  "image_url": "images/Sport_SEN_Egypte_Teranga.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Maroc vs Cameroun — Quart de finale",
+  "cat": "sport",
+  "cat_label": "Affiche match CAN",
+  "image_url": "images/Sport_Maroc_Cameroune_1.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Maroc vs Cameroun — Variante",
+  "cat": "sport",
+  "cat_label": "Affiche match CAN",
+  "image_url": "images/Sport_Maroc_Cameroune_2.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Maroc vs Tanzanie",
+  "cat": "sport",
+  "cat_label": "Affiche match CAN",
+  "image_url": "images/Sport_Maroc_Tanzanie.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Maroc vs Mali — Groupe A",
+  "cat": "sport",
+  "cat_label": "Affiche match CAN",
+  "image_url": "images/Sport_Maroc_Mali.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Happy New Year — Focus sur la Coupe",
+  "cat": "sport",
+  "cat_label": "Affiche évènementielle",
+  "image_url": "images/Sport_NewYear_2025.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Neymar Jr — Santos",
+  "cat": "sport",
+  "cat_label": "Design sport joueur",
+  "image_url": "images/Sport_Neymar.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Hakimi & Pape Gueye — Do Laal",
+  "cat": "sport",
+  "cat_label": "Design sport joueur",
+  "image_url": "images/Sport_Hakimi_PapeGueye.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Achraf Hakimi — Le retour à la CAN",
+  "cat": "sport",
+  "cat_label": "Design sport joueur",
+  "image_url": "images/Sport_Retour_Hakimi.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Sénégal vs Bénin — Tour 3 Groupe D",
+  "cat": "sport",
+  "cat_label": "Affiche match CAN",
+  "image_url": "images/Sport_SEN_Benin.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Sénégal vs Congo — Groupe D",
+  "cat": "sport",
+  "cat_label": "Affiche match CAN",
+  "image_url": "images/Sport_SEN_Congo.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Sénégal vs Égypte — Demi-finale",
+  "cat": "sport",
+  "cat_label": "Affiche match CAN",
+  "image_url": "images/Sport_SEN_Egypte_DemiFinale.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Sénégal vs Soudan — 1/8 de finale",
+  "cat": "sport",
+  "cat_label": "Affiche match CAN",
+  "image_url": "images/Sport_SEN_Soudan.jpg",
+  "featured": 0
+ },
+ {
+  "title": "Sénégal — Go Gaïndé",
+  "cat": "sport",
+  "cat_label": "Affiche équipe",
+  "image_url": "images/Sport_SEN_GoGainde.jpg",
+  "featured": 0
+ }
+]

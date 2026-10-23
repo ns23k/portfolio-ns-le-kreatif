@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Suivi de devis — Ns_le Kréatif</title>
+<meta name="description" content="Consultez la réponse et le prix de votre demande de devis Ns_le Kréatif.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html#home" class="logo">ns_le<span> kréatif</span></a>
+    <ul class="nav-links">
+      <li><a href="index.html#home">Accueil</a></li>
+      <li><a href="index.html#portfolio">Portfolio</a></li>
+      <li><a href="index.html#sport">Design Sport</a></li>
+      <li><a href="index.html#contact">Devis</a></li>
+      <li><a href="suivi.html" aria-current="page">Suivi devis</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="theme-toggle" id="themeToggle" aria-label="Changer de thème"><i class="fa-solid fa-moon"></i></button>
+      <button class="burger" id="burgerBtn" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </nav>
+</header>
+
+<div class="overlay" id="overlay"></div>
+<div class="mobile-drawer" id="drawer">
+  <button class="drawer-close" id="drawerClose" aria-label="Fermer"><i class="fa-solid fa-xmark"></i></button>
+  <a href="index.html#home">Accueil</a>
+  <a href="index.html#portfolio">Portfolio</a>
+  <a href="index.html#sport">Design Sport</a>
+  <a href="index.html#contact">Demander un devis</a>
+  <a href="suivi.html">Suivi de mon devis</a>
+</div>
+
+<section class="track-hero">
+  <div class="container">
+    <div class="eyebrow"><i class="fa-solid fa-magnifying-glass"></i> Suivi de devis</div>
+    <h1>Où en est <span class="mark">votre projet</span>&nbsp;?</h1>
+    <p>Entrez le code reçu après votre demande et votre email pour voir ma réponse, le prix proposé, et me répondre.</p>
+  </div>
+</section>
+
+<section class="track-main">
+  <div class="container track-grid">
+    <form class="panel" id="trackForm" novalidate>
+      <h2>Retrouver ma demande</h2>
+      <p class="sub">Le code ressemble à <b>NK-7QH2LM</b>.</p>
+      <div class="field">
+        <label for="tcode">Code de suivi</label>
+        <input type="text" id="tcode" placeholder="NK-XXXXXX" autocomplete="off" style="text-transform:uppercase; font-family:'JetBrains Mono',monospace;">
+        <span class="err">Indiquez votre code.</span>
+      </div>
+      <div class="field">
+        <label for="temail">Email utilisé pour la demande</label>
+        <input type="email" id="temail" placeholder="vous@email.com" autocomplete="email">
+        <span class="err">Adresse email invalide.</span>
+      </div>
+      <div class="notice err" id="trackErr" hidden></div>
+      <button class="btn btn-primary" type="submit" id="trackBtn"><i class="fa-solid fa-arrow-right"></i> Voir ma demande</button>
+      <p class="sub" style="margin:18px 0 0;">Pas encore de demande&nbsp;? <a href="index.html#contact" style="color:var(--brand); font-weight:700;">Demander un devis</a></p>
+    </form>
+
+    <div class="panel" id="result">
+      <div class="track-empty">
+        <i class="fa-solid fa-file-invoice"></i>
+        <b>Votre demande s'affichera ici</b>
+        <span>Statut, réponse, montant proposé et échanges.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <a href="index.html#home" class="logo">ns_le<span> kréatif</span></a>
+      <div class="footer-social">
+        <a href="https://instagram.com/ns_le_kreatif" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="mailto:etudeetudiant123@gmail.com" aria-label="Email"><i class="fa-solid fa-envelope"></i></a>
+        <a href="tel:+221785863668" aria-label="Téléphone"><i class="fa-solid fa-phone"></i></a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> Ns_le Kréatif. Tous droits réservés.</span>
+      <span>Design &amp; développement par Ns_le Kréatif</span>
+    </div>
+  </div>
+</footer>
+
+<button id="toTop" aria-label="Retour en haut"><i class="fa-solid fa-arrow-up"></i></button>
+
+<script src="js/common.js"></script>
+<script src="js/suivi.js"></script>
+</body>
+</html>

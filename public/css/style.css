@@ -600,3 +600,18 @@ h1, h2, h3, h4, .service-card h3{font-family:var(--font-title); letter-spacing:-
 .section-head h2, .about-text h2, .quote-left h2{font-weight:800; line-height:1.12;}
 .service-card h3{font-size:22px; font-weight:800; letter-spacing:0;}
 .mark{font-style:italic;}
+
+/* ---------- Clash Display : titres + textes courants ---------- */
+:root{ --font-title:'Clash Display', 'Sora', sans-serif; --font-body:'Clash Display', 'Sora', sans-serif; }
+body, button, input, select, textarea{font-family:var(--font-body);}
+body{letter-spacing:.005em;}
+h1, h2, h3, h4, .service-card h3{font-family:var(--font-title); letter-spacing:-.01em;}
+.hero h1{font-size:clamp(40px,5.4vw,68px); font-weight:600; line-height:1.02;}
+.track-hero h1{font-size:clamp(34px,5vw,56px); font-weight:600; line-height:1.04;}
+.section-head h2, .about-text h2, .quote-left h2{font-weight:600; line-height:1.08;}
+.service-card h3{font-size:21px; font-weight:600;}
+.g-caption h4, .lightbox-info h3, .panel h2, .q-head h2, .form-done h3{font-weight:600;}
+.mark{font-style:normal;}
+.hero p.lead, .section-head p, .about-text p, .service-card p, .quote-left p{font-weight:400;}
+.nav-links a, .btn, .filter-btn{font-weight:500; letter-spacing:.01em;}
+.marquee span{font-family:var(--font-body); font-weight:600;}

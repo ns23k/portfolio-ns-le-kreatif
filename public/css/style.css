@@ -688,3 +688,18 @@ html.dark .g-item.is-logo .thumb{background:#fff;}
   .hero-stats div strong{font-size:24px;}
   .hero-stats div span{font-size:11px;}
 }
+
+/* ---------- Cartes de visite : léger contour pour voir la limite de la carte ---------- */
+.g-item.is-carte img, .slide.is-carte img, .lightbox.is-carte .lightbox-inner img{
+  width:auto; height:auto; max-width:100%; max-height:100%; object-fit:contain;
+  border:1px solid rgba(16,20,43,.16); border-radius:6px;
+  box-shadow:0 1px 2px rgba(16,20,43,.08), 0 10px 22px -12px rgba(16,20,43,.35);
+}
+.slide.is-carte{background:#fff;}
+.slide.is-carte img{padding:0; background:#fff; margin:28px auto; max-width:calc(100% - 40px); max-height:284px;}
+.slide.is-carte{display:flex; flex-direction:column; align-items:center;}
+.slide.is-carte .slide-caption{align-self:stretch;}
+.lightbox.is-carte .lightbox-inner{background:var(--surface);}
+.lightbox.is-carte .lightbox-inner > img{display:block; margin:28px auto; padding:0; max-width:calc(100% - 56px); max-height:60vh;}
+.lightbox.is-carte .lightbox-inner{display:flex; flex-direction:column;}
+.lightbox.is-carte .lightbox-info{align-self:stretch; border-top:1px solid var(--border);}

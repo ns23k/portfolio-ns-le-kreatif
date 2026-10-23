@@ -42,7 +42,7 @@ function buildSlider(){
   sliderEl.innerHTML = ''; dotsEl.innerHTML = '';
   featured.forEach((w, i) => {
     const s = document.createElement('div');
-    s.className = 'slide' + (i === 0 ? ' active' : '') + (['logo','carte'].includes(w.cat) ? ' is-logo' : '') + (w.cat === 'mockup' ? ' is-mockup' : '');
+    s.className = 'slide' + (i === 0 ? ' active' : '') + (['logo','carte'].includes(w.cat) ? ' is-logo' : '') + (w.cat === 'carte' ? ' is-carte' : '') + (w.cat === 'mockup' ? ' is-mockup' : '');
     s.innerHTML = `<img src="${NK.esc(w.src)}" alt="${NK.esc(w.title)}"><div class="slide-caption">${NK.esc(w.title)}</div>`;
     sliderEl.appendChild(s);
     const d = document.createElement('button');
@@ -92,7 +92,7 @@ function buildFilters(){
 
 function card(w, i){
   const item = document.createElement('div');
-  item.className = 'g-item' + (['logo','carte'].includes(w.cat) ? ' is-logo' : '') + (w.cat === 'mockup' ? ' is-mockup' : '');
+  item.className = 'g-item' + (['logo','carte'].includes(w.cat) ? ' is-logo' : '') + (w.cat === 'carte' ? ' is-carte' : '') + (w.cat === 'mockup' ? ' is-mockup' : '');
   item.tabIndex = 0;
   item.setAttribute('role', 'button');
   item.setAttribute('aria-label', `Agrandir : ${w.title}`);
@@ -132,6 +132,7 @@ function openLightbox(w){
   lastFocus = document.activeElement;
   lbImg.src = w.src; lbImg.alt = w.title; lbImg.hidden = false;
   lightbox.classList.toggle('is-logo', ['logo','carte'].includes(w.cat));
+  lightbox.classList.toggle('is-carte', w.cat === 'carte');
   lightbox.classList.toggle('is-mockup', w.cat === 'mockup');
   lbTitle.textContent = w.title;
   lbCat.textContent = w.catLabel;

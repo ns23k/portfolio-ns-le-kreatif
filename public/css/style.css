@@ -786,6 +786,6 @@ html.dark .web-body .cat{color:var(--accent);}
 /* ---------- Photo de profil détourée (plus de fond blanc autour du cadre) ---------- */
 .avatar-frame{aspect-ratio:auto; background:none; box-shadow:none; border-radius:0; overflow:visible;}
 .avatar-frame img{width:100%; height:auto; object-fit:contain; filter:drop-shadow(0 22px 28px rgba(0,0,0,.35));}
-/* cadre jaune + pointillé doré, avec de l'air autour de la photo (surtout en haut) */
+/* photo seule (coins arrondis) + pointillé doré autour, avec de l'air de chaque côté */
 .avatar-wrap{margin-top:18px;}
-.avatar-ring{display:block; inset:-34px -22px -22px -22px; border-radius:34px;}
+.avatar-ring{display:block; inset:-20px; border-radius:38px;}

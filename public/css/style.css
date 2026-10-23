@@ -552,3 +552,15 @@ html.dark .pill[data-s="nouveau"]{background:#1B2F5E; color:#C9D7FF;}
   .panel{padding:20px;}
   .msg{max-width:100%;}
 }
+
+/* ---------- Chiffres en Marcellus ---------- */
+:root{ --font-num:'Marcellus', 'Times New Roman', serif; }
+.hero-stats div strong,
+.service-num,
+.skill-row span b,
+.price-box strong,
+.msg .msg-price,
+.q-meta b.num{font-family:var(--font-num); font-weight:400; font-variant-numeric:lining-nums; letter-spacing:.01em;}
+.hero-stats div strong{font-size:32px;}
+.price-box strong{font-size:32px;}
+.service-num{opacity:.07;}

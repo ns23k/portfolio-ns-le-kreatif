@@ -279,3 +279,8 @@ dialog::backdrop{background:rgba(5,9,22,.6); backdrop-filter:blur(3px);}
 .wacts .icon-btn{flex-shrink:0;}
 @container (max-width:230px){ .lbl-edit{display:none;} }
 .wcard{container-type:inline-size;}
+
+/* ---------- Chiffres en Marcellus ---------- */
+:root{ --font-num:'Marcellus', 'Times New Roman', serif; }
+.stat strong, .bar-row b, .msg .price, .chip em, .side nav .count, .mobile-tabs .count{font-family:var(--font-num); font-weight:400; font-variant-numeric:lining-nums;}
+.stat strong{font-size:34px;}

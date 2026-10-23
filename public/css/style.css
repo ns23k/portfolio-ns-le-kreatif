@@ -786,3 +786,6 @@ html.dark .web-body .cat{color:var(--accent);}
 /* ---------- Photo de profil détourée (plus de fond blanc autour du cadre) ---------- */
 .avatar-frame{aspect-ratio:auto; background:none; box-shadow:none; border-radius:0; overflow:visible;}
 .avatar-frame img{width:100%; height:auto; object-fit:contain; filter:drop-shadow(0 22px 28px rgba(0,0,0,.35));}
+/* contour jaune retiré : photo seule, coins arrondis, sans pointillé doré */
+.avatar-ring{display:none;}
+.avatar-frame img{filter:drop-shadow(0 20px 30px rgba(0,0,0,.32));}

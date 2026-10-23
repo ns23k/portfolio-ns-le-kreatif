@@ -17,11 +17,12 @@ const CATS = {
   carte: 'Carte de visite',
   brochure: 'Brochure',
   mockup: 'Mockup présentation',
+  charte: 'Charte graphique',
   sport: 'Design sport',
   web: 'Site web',
 };
 const STATUSES = ['nouveau', 'en_cours', 'devis_envoye', 'accepte', 'refuse', 'termine', 'archive'];
-const PROJECT_TYPES = ['Affiche', 'Logo', 'Carte de visite', 'Brochure', 'Design sport', 'Identité visuelle', 'Site web', 'Photographie', 'Autre'];
+const PROJECT_TYPES = ['Affiche', 'Logo', 'Carte de visite', 'Brochure', 'Design sport', 'Identité visuelle', 'Charte graphique', 'Site web', 'Photographie', 'Autre'];
 const MAX_IMAGE = 3.5 * 1024 * 1024;
 const MIME_OK = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 

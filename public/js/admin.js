@@ -179,7 +179,7 @@ function qItem(q){
 /* ============================================
    CRÉATIONS
 ============================================ */
-const CAT_NAMES = { affiche:'Affiches', logo:'Logos', carte:'Cartes de visite', brochure:'Brochures', mockup:'Mockups & Branding', sport:'Design sport', web:'Réalisations web' };
+const CAT_NAMES = { affiche:'Affiches', logo:'Logos', carte:'Cartes de visite', brochure:'Brochures', mockup:'Mockups & Branding', charte:'Charte graphique', sport:'Design sport', web:'Réalisations web' };
 const catName = (k) => CAT_NAMES[k] || state.categories[k] || k;
 
 function fillCatSelect(){

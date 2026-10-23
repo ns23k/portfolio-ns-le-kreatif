@@ -4,8 +4,9 @@
 ============================================ */
 const FILTER_LABELS = {
   affiche: 'Affiches', logo: 'Logos', carte: 'Cartes de visite',
-  brochure: 'Brochures', mockup: 'Mockups & Branding',
+  brochure: 'Brochures', mockup: 'Mockups & Branding', charte: 'Charte graphique',
 };
+const ALWAYS_SHOWN = ['charte']; // filtres visibles même sans création
 let works = [];      // portfolio (hors sport)
 let sportWorks = []; // design sport
 let webWorks = [];   // réalisations web
@@ -82,7 +83,7 @@ const galleryEl = document.getElementById('gallery');
 const filtersEl = document.getElementById('filters');
 
 function buildFilters(){
-  const present = Object.keys(FILTER_LABELS).filter(c => works.some(w => w.cat === c));
+  const present = Object.keys(FILTER_LABELS).filter(c => ALWAYS_SHOWN.includes(c) || works.some(w => w.cat === c));
   filtersEl.innerHTML = `<button class="filter-btn active" data-filter="all">Tous</button>` +
     present.map(c => `<button class="filter-btn" data-filter="${c}">${FILTER_LABELS[c]}</button>`).join('');
   filtersEl.querySelectorAll('.filter-btn').forEach(btn => {
@@ -114,7 +115,12 @@ function card(w, i){
 function renderGallery(filter){
   galleryEl.innerHTML = '';
   const list = filter === 'all' ? works : works.filter(w => w.cat === filter);
-  if(!list.length){ galleryEl.innerHTML = '<div class="gallery-loading">Aucune création dans cette catégorie pour le moment.</div>'; return; }
+  if(!list.length){
+    galleryEl.innerHTML = filter === 'charte'
+      ? '<div class="gallery-loading"><b>Chartes graphiques à venir</b><br>Logos, couleurs, typographies et règles d\'usage : les premières chartes arrivent bientôt. <a href="#contact" style="color:var(--brand); font-weight:600;">Besoin d\'une charte ? Demandez un devis →</a></div>'
+      : '<div class="gallery-loading">Aucune création dans cette catégorie pour le moment.</div>';
+    return;
+  }
   list.forEach((w, i) => galleryEl.appendChild(card(w, i)));
 }
 

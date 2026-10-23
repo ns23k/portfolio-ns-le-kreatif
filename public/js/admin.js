@@ -370,15 +370,23 @@ dlg.addEventListener('click', (e) => { if(e.target === dlg) dlg.close(); });
 
 function setPreview(src){
   const drop = $('#drop');
-  drop.classList.remove('invalid');
-  $$('img, .change', drop).forEach(n => n.remove());
+  drop.classList.remove('invalid', 'multi');
+  $$('img, .change, .multi-grid', drop).forEach(n => n.remove());
+  if(Array.isArray(src)){
+    drop.classList.add('multi');
+    drop.insertAdjacentHTML('beforeend', `<div class="multi-grid">${src.slice(0, 9).map((u, i) => `<span><img src="${esc(u)}" alt=""><em>${i + 1}</em></span>`).join('')}${src.length > 9 ? `<span class="more">+${src.length - 9}</span>` : ''}</div><span class="change"><i class="fa-solid fa-images"></i> ${src.length} images · changer</span>`);
+    return;
+  }
   if(src){
     drop.insertAdjacentHTML('beforeend', `<img src="${esc(src)}" alt=""><span class="change"><i class="fa-solid fa-arrows-rotate"></i> Changer l'image</span>`);
   }
 }
 
 function openWork(w = null){
-  editing = w; pendingBlob = null; currentSrc = w?.src || '';
+  editing = w; pendingBlob = null; pendingBlobs = []; currentSrc = w?.src || '';
+  $('#wfile').multiple = !w;
+  $('#dropTitle').textContent = w ? 'Choisir une image' : 'Choisir une ou plusieurs images';
+  $('#dropHint').textContent = w ? 'ou glisse-la ici · JPG, PNG, WEBP' : 'ou glisse-les ici · JPG, PNG, WEBP';
   $('#workDlgTitle').textContent = w ? 'Modifier la création' : 'Nouvelle création';
   $('#wtitle').value = w?.title || '';
   $('#wcat').value = w?.cat || (state.wcat !== 'all' ? state.wcat : 'affiche');
@@ -399,6 +407,7 @@ function openWork(w = null){
 }
 
 $('#wcat').addEventListener('change', () => { if($('#wlabel').dataset.auto) $('#wlabel').value = state.categories[$('#wcat').value] || ''; toggleWebFields(); });
+let pendingBlobs = [];
 
 /* ----- réalisations web : lien, technologies, capture automatique ----- */
 function toggleWebFields(){ $('#webFields').hidden = $('#wcat').value !== 'web'; }
@@ -451,19 +460,40 @@ async function pickFile(file){
   if(!/^image\/(jpeg|png|webp|gif)$/.test(file.type)){ toast('Format non accepté (JPG, PNG, WEBP ou GIF).', true); return; }
   $('#uplInfo').textContent = 'Optimisation…';
   try {
-    pendingBlob = await optimise(file);
+    pendingBlob = await optimise(file); pendingBlobs = [];
     setPreview(URL.createObjectURL(pendingBlob));
     $('#uplInfo').textContent = `${file.name} · ${(file.size / 1024 / 1024).toFixed(1)} Mo → ${(pendingBlob.size / 1024).toFixed(0)} Ko`;
     if(!$('#wtitle').value) $('#wtitle').value = file.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
   } catch (err) { toast(err.message, true); $('#uplInfo').textContent = ''; }
 }
-$('#wfile').addEventListener('change', (e) => { pickFile(e.target.files[0]); e.target.value = ''; });
+async function pickFiles(list){
+  const files = [...(list || [])];
+  if(files.length <= 1 || editing){ pendingBlobs = []; return pickFile(files[0]); }
+  const ok = files.filter(f => /^image\/(jpeg|png|webp|gif)$/.test(f.type));
+  if(ok.length < files.length) toast(`${files.length - ok.length} fichier(s) ignoré(s) : format non accepté.`, true);
+  if(ok.length > 30){ toast('30 images maximum à la fois.', true); ok.length = 30; }
+  if(!ok.length) return;
+  if(ok.length === 1){ pendingBlobs = []; return pickFile(ok[0]); }
+  ok.sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
+  pendingBlob = null; currentSrc = ''; pendingBlobs = [];
+  try {
+    for(let i = 0; i < ok.length; i++){
+      $('#uplInfo').textContent = `Optimisation ${i + 1}/${ok.length}…`;
+      pendingBlobs.push(await optimise(ok[i]));
+    }
+    setPreview(pendingBlobs.map(b => URL.createObjectURL(b)));
+    const total = pendingBlobs.reduce((n, b) => n + b.size, 0);
+    $('#uplInfo').textContent = `${ok.length} images prêtes (${(total / 1024 / 1024).toFixed(1)} Mo) · une créa sera créée par image, dans cet ordre.`;
+    if(!$('#wtitle').value) $('#wtitle').value = ok[0].name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').replace(/\s*\d+$/, '').trim();
+  } catch (err) { pendingBlobs = []; toast(err.message, true); $('#uplInfo').textContent = ''; }
+}
+$('#wfile').addEventListener('change', (e) => { pickFiles(e.target.files); e.target.value = ''; });
 const drop = $('#drop');
 drop.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); $('#wfile').click(); } });
 drop.tabIndex = 0;
 ['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
 ['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove('over')));
-drop.addEventListener('drop', (e) => { e.preventDefault(); pickFile(e.dataTransfer.files[0]); });
+drop.addEventListener('drop', (e) => { e.preventDefault(); pickFiles(e.dataTransfer.files); });
 
 $('#workForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -473,14 +503,39 @@ $('#workForm').addEventListener('submit', async (e) => {
   const okLink = !link || isUrl(link);
   $('#wlink').closest('.field').classList.toggle('invalid', !okLink);
   if(!okLink) return;
-  if(isWeb && !pendingBlob && !currentSrc && link) currentSrc = shotUrl(link); // capture auto si pas d'image
-  const okTitle = title.length >= 2, okImg = !!(pendingBlob || currentSrc);
+  if(isWeb && !pendingBlob && !currentSrc && !pendingBlobs.length && link) currentSrc = shotUrl(link); // capture auto si pas d'image
+  const okTitle = title.length >= 2, okImg = !!(pendingBlob || currentSrc || pendingBlobs.length);
   $('#wtitle').closest('.field').classList.toggle('invalid', !okTitle);
   $('#drop').classList.toggle('invalid', !okImg);
   if(!okImg) toast('Ajoute une image.', true);
   if(!okTitle || !okImg) return;
   const btn = $('#wsave');
   btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
+  if(!editing && pendingBlobs.length){
+    const n = pendingBlobs.length, created = [];
+    try {
+      // envoi de la dernière à la première : chaque nouvelle créa passe en tête, l'ordre final reste 1, 2, 3…
+      for(let i = n - 1; i >= 0; i--){
+        btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Envoi ${n - i}/${n}…`;
+        const blob = pendingBlobs[i];
+        const up = await api('/api/admin/media', {method:'POST', body: blob, headers: {'Content-Type': blob.type || 'image/jpeg'}});
+        const payload = {
+          title: `${title} — ${i + 1}`.slice(0, 200), cat: $('#wcat').value, catLabel: $('#wlabel').value.trim(), description: $('#wdesc').value.trim(),
+          src: up.url, published: $('#wpub').checked, featured: $('#wfeat').checked && i === 0,
+          link: isWeb ? (link || null) : null, tags: isWeb ? $('#wtags').value.trim() : null,
+        };
+        const { work } = await api('/api/admin/works', {method:'POST', body: JSON.stringify(payload)});
+        state.works.unshift(work); created.push(work);
+      }
+      toast(`${n} créations ajoutées`);
+      dlg.close();
+      if(location.hash.startsWith('#creas')) renderWorks(); else location.hash = '#creas';
+    } catch (err) {
+      toast(created.length ? `${created.length}/${n} ajoutées, puis erreur : ${err.message}` : err.message, true);
+      if(created.length){ pendingBlobs = pendingBlobs.slice(0, n - created.length); setPreview(pendingBlobs.map(b => URL.createObjectURL(b))); renderWorks(); }
+    } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Enregistrer'; }
+    return;
+  }
   try {
     let src = currentSrc;
     if(pendingBlob){

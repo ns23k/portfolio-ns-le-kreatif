@@ -567,3 +567,23 @@ html.dark .pill[data-s="nouveau"]{background:#1B2F5E; color:#C9D7FF;}
 
 /* ---------- Titres des services en Cinzel (cousine grasse de Marcellus) ---------- */
 .service-card h3{font-family:'Cinzel', 'Marcellus', serif; font-weight:700; font-size:20px; letter-spacing:.02em; line-height:1.2;}
+
+/* ---------- Tous les titres en Cinzel ---------- */
+:root{ --font-title:'Cinzel', 'Marcellus', Georgia, serif; }
+h1, h2, h3, h4{font-family:var(--font-title); letter-spacing:.01em;}
+.hero h1, .track-hero h1{font-weight:800; line-height:1.12; letter-spacing:0;}
+.hero h1{font-size:clamp(34px,4.9vw,58px);}
+.track-hero h1{font-size:clamp(30px,4.6vw,48px);}
+.section-head h2, .about-text h2, .quote-left h2{font-weight:800; line-height:1.18;}
+.g-caption h4, .lightbox-info h3, .panel h2, .q-head h2, .form-done h3{font-weight:700;}
+
+
+/* ---------- Lisibilité des champs du formulaire (même en thème sombre) ---------- */
+.form-card{color-scheme:light;}
+.form-card .field input, .form-card .field select, .form-card .field textarea{color:#10142B;}
+.form-card .field input::placeholder, .form-card .field textarea::placeholder{color:#7A809C; opacity:1;}
+.form-card .field select option{color:#10142B; background:#fff;}
+.form-card .field select:invalid, .form-card .field select option[value=""]{color:#7A809C;}
+/* surlignage qui suit le texte ligne par ligne (titres sur plusieurs lignes) */
+.mark{display:inline; background:linear-gradient(transparent 56%, var(--accent) 56%, var(--accent) 90%, transparent 90%); -webkit-box-decoration-break:clone; box-decoration-break:clone; padding:0 .12em;}
+.mark::after{content:none;}

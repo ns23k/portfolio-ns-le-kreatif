@@ -221,7 +221,7 @@ function renderWorks(){
     return;
   }
   $('#wgrid').innerHTML = list.map(w => `
-    <article class="wcard ${w.published ? '' : 'hidden-work'}" data-id="${w.id}">
+    <article class="wcard ${w.published ? '' : 'hidden-work'} ${w.cat === 'logo' ? 'is-logo' : ''}" data-id="${w.id}">
       <div class="wthumb" data-edit>
         <img src="${esc(w.src)}" alt="" loading="lazy">
         <div class="wbadges">

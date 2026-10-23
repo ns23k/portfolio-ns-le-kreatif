@@ -615,3 +615,11 @@ h1, h2, h3, h4, .service-card h3{font-family:var(--font-title); letter-spacing:-
 .hero p.lead, .section-head p, .about-text p, .service-card p, .quote-left p{font-weight:400;}
 .nav-links a, .btn, .filter-btn{font-weight:500; letter-spacing:.01em;}
 .marquee span{font-family:var(--font-body); font-weight:600;}
+
+/* ---------- Logos : entiers, centrés, avec une marge ---------- */
+.g-item.is-logo .thumb{background:#fff; display:flex; align-items:center; justify-content:center; padding:12%;}
+.g-item.is-logo img{width:100%; height:100%; object-fit:contain;}
+.g-item.is-logo:hover img{transform:scale(1.04);}
+html.dark .g-item.is-logo .thumb{background:#fff;}
+.slide.is-logo img{object-fit:contain; background:#fff; padding:28px;}
+.lightbox.is-logo .lightbox-inner img{object-fit:contain; background:#fff; padding:32px; max-height:65vh;}

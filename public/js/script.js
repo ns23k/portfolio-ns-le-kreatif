@@ -42,7 +42,7 @@ function buildSlider(){
   sliderEl.innerHTML = ''; dotsEl.innerHTML = '';
   featured.forEach((w, i) => {
     const s = document.createElement('div');
-    s.className = 'slide' + (i === 0 ? ' active' : '');
+    s.className = 'slide' + (i === 0 ? ' active' : '') + (w.cat === 'logo' ? ' is-logo' : '');
     s.innerHTML = `<img src="${NK.esc(w.src)}" alt="${NK.esc(w.title)}"><div class="slide-caption">${NK.esc(w.title)}</div>`;
     sliderEl.appendChild(s);
     const d = document.createElement('button');
@@ -92,7 +92,7 @@ function buildFilters(){
 
 function card(w, i){
   const item = document.createElement('div');
-  item.className = 'g-item';
+  item.className = 'g-item' + (w.cat === 'logo' ? ' is-logo' : '');
   item.tabIndex = 0;
   item.setAttribute('role', 'button');
   item.setAttribute('aria-label', `Agrandir : ${w.title}`);
@@ -131,6 +131,7 @@ let lastFocus = null;
 function openLightbox(w){
   lastFocus = document.activeElement;
   lbImg.src = w.src; lbImg.alt = w.title; lbImg.hidden = false;
+  lightbox.classList.toggle('is-logo', w.cat === 'logo');
   lbTitle.textContent = w.title;
   lbCat.textContent = w.catLabel;
   lbDesc.textContent = w.description || '';

@@ -564,3 +564,6 @@ html.dark .pill[data-s="nouveau"]{background:#1B2F5E; color:#C9D7FF;}
 .hero-stats div strong{font-size:32px;}
 .price-box strong{font-size:32px;}
 .service-num{opacity:.07;}
+
+/* ---------- Titres des services en Cinzel (cousine grasse de Marcellus) ---------- */
+.service-card h3{font-family:'Cinzel', 'Marcellus', serif; font-weight:700; font-size:20px; letter-spacing:.02em; line-height:1.2;}

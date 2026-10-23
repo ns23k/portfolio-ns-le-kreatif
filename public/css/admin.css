@@ -139,7 +139,7 @@ html.dark .stat.hl{color:#081226;} html.dark .stat.hl span, html.dark .stat.hl s
 .qitem .r{display:flex; flex-direction:column; align-items:flex-end; gap:5px; font-size:11.5px; color:var(--muted);}
 .qitem.unread .t{color:var(--text);}
 .empty{padding:36px 16px; text-align:center; color:var(--muted);}
-.empty i{font-size:28px; color:var(--accent); display:block; margin-bottom:10px;}
+.empty > i{font-size:28px; color:var(--accent); display:block; margin-bottom:10px;}
 
 /* ---------- créations ---------- */
 .toolbar{display:flex; gap:10px; flex-wrap:wrap; align-items:center; margin-bottom:18px;}
@@ -287,3 +287,18 @@ dialog::backdrop{background:rgba(5,9,22,.6); backdrop-filter:blur(3px);}
 .wcard.is-logo .wthumb{background:#fff; display:flex; align-items:center; justify-content:center; padding:12%;}
 .wcard.is-logo .wthumb img{object-fit:contain;}
 .logo span::after{content:none; display:none;}
+
+/* ---------- Mobile : filtres sur une ligne qui défile ---------- */
+@media (max-width:900px){
+  .chips{flex-wrap:nowrap; overflow-x:auto; margin-left:-16px; margin-right:-16px; padding:2px 16px 6px; scrollbar-width:none; -webkit-overflow-scrolling:touch;}
+  .qside .chips{margin-left:-20px; margin-right:-20px; padding-left:20px; padding-right:20px;}
+  .chips::-webkit-scrollbar{display:none;}
+  .chip{flex:0 0 auto; white-space:nowrap;}
+  .input, .field input, .field select, .field textarea{font-size:16px;}
+  .toolbar .input{min-width:0;}
+  dialog{width:calc(100% - 20px); max-height:calc(100dvh - 20px);}
+}
+@media (max-width:900px){
+  .qsplit{grid-template-columns:minmax(0,1fr);}
+  .qside, .qdetail, .card{min-width:0;}
+}

@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="css/admin.css?v=202610231816">
+<link rel="stylesheet" href="css/admin.css?v=202610231821">
 <script>try{var t=localStorage.getItem('nk-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}</script>
 </head>
 <body>
@@ -108,7 +108,10 @@
       </div>
       <div class="qsplit" id="qsplit">
         <div class="card qside">
-          <input class="input" id="qsearch" type="search" placeholder="Nom, email, code…">
+          <div class="q-tools">
+            <div class="q-search"><i class="fa-solid fa-magnifying-glass"></i><input class="input" id="qsearch" type="search" placeholder="Rechercher…" title="Nom, email, téléphone ou code" aria-label="Rechercher une demande"></div>
+            <label class="q-select-wrap"><span class="sr-only">Filtrer les demandes</span><select class="input" id="qselect" aria-label="Filtrer les demandes"></select></label>
+          </div>
           <div class="chips" id="qchips" style="margin-bottom:10px;"></div>
           <div class="qlist" id="qlist"></div>
         </div>
@@ -242,6 +245,6 @@
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="js/admin.js?v=202610231816"></script>
+<script src="js/admin.js?v=202610231821"></script>
 </body>
 </html>

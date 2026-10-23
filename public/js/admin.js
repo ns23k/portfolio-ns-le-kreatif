@@ -528,7 +528,11 @@ async function loadQuotes(id){
 function renderQChips(){
   $('#qchips').innerHTML = QFILTERS.map(([k, l]) => `<button class="chip ${state.qfilter === k ? 'active' : ''}" data-f="${k}">${l}</button>`).join('');
   $$('#qchips .chip').forEach(c => c.addEventListener('click', () => { state.qfilter = c.dataset.f; renderQChips(); fetchQuotes(); }));
+  // version mobile : même filtre dans un menu déroulant
+  const sel = $('#qselect');
+  sel.innerHTML = QFILTERS.map(([k, l]) => `<option value="${k}" ${state.qfilter === k ? 'selected' : ''}>${l}</option>`).join('');
 }
+$('#qselect').addEventListener('change', (e) => { state.qfilter = e.target.value; renderQChips(); fetchQuotes(); });
 async function fetchQuotes(){
   try {
     const p = new URLSearchParams({status: state.qfilter, q: state.qsearch});

@@ -338,3 +338,50 @@ dialog::backdrop{background:rgba(5,9,22,.6); backdrop-filter:blur(3px);}
 .wcard.is-logo .wthumb{color-scheme:only light; background-color:#fff !important;}
 .wcard.is-padded .wthumb{padding:0 !important;}
 .wcard.is-padded .wthumb img{width:100% !important; height:100% !important; max-width:none !important; max-height:none !important; object-fit:cover !important; border:0 !important; border-radius:0 !important; box-shadow:none !important;}
+
+/* ---------- Devis : recherche + filtre ---------- */
+.sr-only{position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap;}
+.q-tools{display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:10px;}
+.q-search{position:relative;}
+.q-search i{position:absolute; left:13px; top:50%; transform:translateY(-50%); color:var(--muted); font-size:13px; pointer-events:none;}
+.q-search .input{padding-left:36px; margin:0 !important;}
+.q-select-wrap{display:none;}
+.qside .input{margin-bottom:0;}
+@media (max-width:900px){
+  /* filtre en menu déroulant, plus de pastilles coupées */
+  .q-tools{grid-template-columns:minmax(0,1fr) auto;}
+  .q-select-wrap{display:block;}
+  .q-select-wrap select{width:auto; max-width:44vw; min-width:132px; height:100%; font-weight:600; background-color:var(--surface-2);}
+  #qchips{display:none !important;}
+  /* liste pleine largeur, carte allégée */
+  .qside.card{padding:12px; border-radius:16px;}
+  .qside .qlist{margin:0 -4px; padding:0;}
+  .qitem{padding:12px 8px; grid-template-columns:8px minmax(0,1fr) auto; gap:10px;}
+  .qitem .r{max-width:42%;}
+  .qitem .r .pill{font-size:11px; padding:3px 8px;}
+  .qside .empty{padding:28px 8px;}
+  .qdetail.card{padding:16px; border-radius:16px;}
+  .qhead h2{font-size:20px;}
+  .qhead > div:last-child{width:100%;}
+  .qhead select#qstatus{flex:1;}
+  .contact .btn{flex:1 1 auto; justify-content:center;}
+  .meta{grid-template-columns:1fr 1fr;}
+  .meta div:last-child:nth-child(odd){grid-column:1/-1;}
+  .msg{max-width:100%;}
+  .composer-foot{flex-direction:column; align-items:stretch;}
+  .composer-foot .btn{width:100%;}
+  .danger-zone{justify-content:stretch;}
+  .danger-zone .btn{flex:1;}
+}
+@media (max-width:380px){
+  .q-select-wrap select{min-width:112px; font-size:14px;}
+  .meta{grid-template-columns:1fr;}
+}
+@media (max-width:900px){
+  /* la barre du haut ne s'étire plus quand la page est courte */
+  .app{grid-template-rows:auto 1fr; align-content:start;}
+  .mobile-bar{align-self:start;}
+  /* heure et statut lisibles */
+  .qitem .r{max-width:none; flex-shrink:0;}
+  .qitem .r > span:last-child{white-space:nowrap;}
+}

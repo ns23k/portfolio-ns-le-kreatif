@@ -175,7 +175,7 @@ app.post('/api/track/reply', rateLimit('trackreply', 10, 10 * 60 * 1000), wrap(a
   await query('INSERT INTO quote_messages (quote_id, author, body) VALUES (?, "client", ?)', [q.id, body]);
   const newStatus = action === 'accept' ? 'accepte' : action === 'refuse' ? 'refuse' : q.status;
   await query('UPDATE quotes SET unread_admin = 1, status = ? WHERE id = ?', [newStatus, q.id]);
-  mailer.notifyClientMessage(q, body, action);
+  await mailer.notifyClientMessage(q, body, action); // attendu : sur Vercel la fonction s'arrête après la réponse
   res.json({ ok: true, status: newStatus });
 }));
 

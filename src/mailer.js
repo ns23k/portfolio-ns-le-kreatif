@@ -44,10 +44,10 @@ function trackUrl(code) {
   return `${base}/suivi.html?code=${encodeURIComponent(code)}`;
 }
 
-async function send(to, subject, html) {
+async function send(to, subject, html, replyTo) {
   if (!enabled() || !to) return false;
   try {
-    await getTransporter().sendMail({ from: process.env.MAIL_FROM || process.env.SMTP_USER, to, subject, html });
+    await getTransporter().sendMail({ from: process.env.MAIL_FROM || process.env.SMTP_USER, to, subject, html, ...(replyTo ? { replyTo } : {}) });
     return true;
   } catch (e) {
     console.error('[mail] échec :', e.message);
@@ -62,7 +62,7 @@ async function notifyNewQuote(q) {
     <p><b>${esc(q.name)}</b> — ${esc(q.email)}${q.phone ? ' — ' + esc(q.phone) : ''}</p>
     <p><b>Projet :</b> ${esc(q.project_type)}${q.budget ? ' · <b>Budget :</b> ' + esc(q.budget) : ''}${q.deadline ? ' · <b>Délai :</b> ' + esc(q.deadline) : ''}</p>
     <p style="background:#F5F6FA;border-radius:10px;padding:14px">${nl2br(q.message)}</p>
-    <p><a href="${base}/admin.html#devis/${q.id}" style="background:#0E2A5E;color:#fff;padding:11px 18px;border-radius:30px;text-decoration:none;font-weight:bold">Répondre dans l'admin</a></p>`));
+    <p><a href="${base}/admin.html#devis/${q.id}" style="background:#0E2A5E;color:#fff;padding:11px 18px;border-radius:30px;text-decoration:none;font-weight:bold">Répondre dans l'admin</a></p>`), q.email);
   const p2 = send(q.email, `Votre demande de devis ${q.code} est bien reçue`, layout('Merci pour votre demande !', `
     <p>Bonjour ${esc(q.name)},</p>
     <p>J'ai bien reçu votre demande pour : <b>${esc(q.project_type)}</b>. Je reviens vers vous très vite avec une proposition.</p>
@@ -87,7 +87,7 @@ async function notifyClientMessage(q, body, action) {
   const base = (process.env.SITE_URL || '').replace(/\/$/, '');
   return send(process.env.ADMIN_NOTIFY_EMAIL, `${q.name} ${label} — ${q.code}`, layout(`${q.name} ${label}`, `
     ${body ? `<p style="background:#F5F6FA;border-radius:10px;padding:14px">${nl2br(body)}</p>` : ''}
-    <p><a href="${base}/admin.html#devis/${q.id}" style="background:#0E2A5E;color:#fff;padding:11px 18px;border-radius:30px;text-decoration:none;font-weight:bold">Ouvrir la demande</a></p>`));
+    <p><a href="${base}/admin.html#devis/${q.id}" style="background:#0E2A5E;color:#fff;padding:11px 18px;border-radius:30px;text-decoration:none;font-weight:bold">Ouvrir la demande</a></p>`), q.email);
 }
 
 module.exports = { enabled, notifyNewQuote, notifyReply, notifyClientMessage };

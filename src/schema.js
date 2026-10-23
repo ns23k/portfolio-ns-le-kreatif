@@ -59,6 +59,28 @@ async function migrate(log) {
     await query("INSERT INTO meta (k, v) VALUES ('seed_web_v1', 'ok')");
     log('✔ Réalisation web « Ligeey » ajoutée');
   }
+
+  const done2 = await query("SELECT v FROM meta WHERE k = 'seed_web_v2'");
+  if (!done2.length) {
+    const sites = [
+      ['Tabarkalla Transport', 'Site de réservation · Transport',
+        "Réservation en ligne des trajets UGB – Thiès – Dakar : recherche de départ par arrêt et horaire, choix du nombre de places, et suivi des lignes quotidiennes à 3 700 FCFA la place.",
+        'https://tabarkalla.wuaze.com/', 'PHP, MySQL, JavaScript'],
+      ['AEEFB — Accueil des bacheliers', "Plateforme d'inscription · Association",
+        "Plateforme de l'Amicale des Élèves et Étudiants de Fass Boye : inscription des nouveaux bacheliers, espace personnel de suivi et espace administrateur avec notifications, filtres et export Excel.",
+        'https://aeefb.wuaze.com/', 'PHP, MySQL, JavaScript'],
+    ];
+    for (const [title, label, desc, link, tags] of sites) {
+      const exists = await query("SELECT id FROM works WHERE cat = 'web' AND link_url = ?", [link]);
+      if (exists.length) continue; // déjà ajouté depuis l'admin
+      const [{ p }] = await query('SELECT COALESCE(MAX(position), 0) + 10 AS p FROM works');
+      await query(
+        'INSERT INTO works (title, cat, cat_label, description, image_url, link_url, tags, featured, published, position) VALUES (?,?,?,?,?,?,?,0,1,?)',
+        [title, 'web', label, desc, shotUrl(link), link, tags, Number(p)]);
+    }
+    await query("INSERT INTO meta (k, v) VALUES ('seed_web_v2', 'ok')");
+    log('✔ Réalisations web « Tabarkalla Transport » et « AEEFB » ajoutées');
+  }
 }
 
 let ready = globalThis.__nkSchemaReady;

@@ -798,3 +798,15 @@ html.dark .web-body .cat{color:var(--accent);}
 }
 .avatar-ring{inset:-20px; border-radius:50px;}
 @media (max-width:720px){ .avatar-frame img{border-radius:28px;} .avatar-ring{inset:-16px; border-radius:40px;} }
+
+/* ---------- Logos & cartes : fond blanc garanti, même avec le « mode sombre forcé » des navigateurs mobiles ---------- */
+.g-item.is-logo .thumb, .slide.is-logo, .slide.is-logo img, .lightbox.is-logo .lightbox-inner img{
+  color-scheme:only light; background-color:#fff !important;
+}
+
+/* image déjà composée avec sa marge blanche : on l'affiche pleine case */
+.g-item.is-padded .thumb{padding:0 !important;}
+.g-item.is-padded img{width:100% !important; height:100% !important; max-width:none !important; max-height:none !important; object-fit:cover !important; border:0 !important; border-radius:0 !important; box-shadow:none !important;}
+.slide.is-padded img{padding:0 !important; margin:0 !important; max-width:none !important; max-height:none !important; width:100% !important; height:340px !important; object-fit:cover !important; border:0 !important; border-radius:0 !important; box-shadow:none !important;}
+.lightbox.is-padded .lightbox-inner > img{padding:0 !important; margin:0 !important; max-width:100% !important; width:100% !important; max-height:65vh !important; object-fit:contain !important; border:0 !important; border-radius:0 !important; box-shadow:none !important;}
+@media (max-width:720px){ .slide.is-padded img{height:290px !important;} }

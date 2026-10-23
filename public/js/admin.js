@@ -259,7 +259,42 @@ function renderWorks(){
     });
     $$('[data-move]', card).forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); moveWork(id, Number(b.dataset.move)); }));
   });
+  $$('#wgrid .wcard.is-logo').forEach(card => {
+    const im = card.querySelector('.wthumb img'); if(!im || im.dataset.padded) return;
+    im.dataset.padded = '1'; const isCarte = card.classList.contains('is-carte');
+    padImage(im.getAttribute('src'), { ratio: 4/5, pad: isCarte ? 0.09 : 0.12, card: isCarte })
+      .then(url => { im.src = url; card.classList.add('is-padded'); }).catch(() => { delete im.dataset.padded; });
+  });
   if(reorder) enableDrag();
+}
+
+
+/* Logos & cartes : marge blanche dessinée DANS l'image (résiste au « mode sombre forcé » des navigateurs mobiles) */
+const _padCache = new Map();
+function padImage(src, { ratio = 4/5, pad = 0.12, card = false } = {}){
+  const key = [src, ratio, pad, card].join('|');
+  if(_padCache.has(key)) return _padCache.get(key);
+  const job = new Promise((resolve, reject) => {
+    const img = new Image(); img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const W = Math.min(560, Math.max(320, img.naturalWidth * 1.3)), H = Math.round(W / ratio);
+        const cv = document.createElement('canvas'); cv.width = W; cv.height = H; const x = cv.getContext('2d');
+        x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+        const s = Math.min((W*(1-2*pad))/img.naturalWidth, (H*(1-2*pad))/img.naturalHeight);
+        const w = img.naturalWidth*s, h = img.naturalHeight*s, ox = (W-w)/2, oy = (H-h)/2;
+        if(card){
+          const r = Math.max(4, w*0.018);
+          x.save(); x.shadowColor='rgba(16,20,43,.28)'; x.shadowBlur=W*0.04; x.shadowOffsetY=W*0.018; x.beginPath(); x.roundRect(ox,oy,w,h,r); x.fillStyle='#fff'; x.fill(); x.restore();
+          x.save(); x.beginPath(); x.roundRect(ox,oy,w,h,r); x.clip(); x.drawImage(img,ox,oy,w,h); x.restore();
+          x.beginPath(); x.roundRect(ox+.5,oy+.5,w-1,h-1,r); x.lineWidth=Math.max(1,W/360); x.strokeStyle='rgba(16,20,43,.18)'; x.stroke();
+        } else x.drawImage(img, ox, oy, w, h);
+        resolve(cv.toDataURL('image/jpeg', 0.9));
+      } catch (e) { reject(e); }
+    };
+    img.onerror = reject; img.src = src;
+  });
+  _padCache.set(key, job); return job;
 }
 
 async function patchWork(w, changes, msg){

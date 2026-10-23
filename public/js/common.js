@@ -73,3 +73,49 @@ const NK = {
   const y = document.getElementById('year');
   if(y) y.textContent = new Date().getFullYear();
 })();
+
+/* ============================================
+   Logos & cartes : la marge blanche est dessinée DANS l'image,
+   pour que le « mode sombre forcé » des navigateurs mobiles ne la fonce pas.
+============================================ */
+NK._padCache = new Map();
+NK.padImage = function(src, { ratio = 4/5, pad = 0.12, card = false, maxW = 720 } = {}){
+  const key = [src, ratio, pad, card, maxW].join('|');
+  if(NK._padCache.has(key)) return NK._padCache.get(key);
+  const job = new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      try {
+        const W = Math.min(maxW, Math.max(320, img.naturalWidth * 1.3));
+        const H = Math.round(W / ratio);
+        const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+        const x = cv.getContext('2d');
+        x.fillStyle = '#fff'; x.fillRect(0, 0, W, H);
+        const s = Math.min((W * (1 - 2*pad)) / img.naturalWidth, (H * (1 - 2*pad)) / img.naturalHeight);
+        const w = img.naturalWidth * s, h = img.naturalHeight * s, ox = (W - w) / 2, oy = (H - h) / 2;
+        if(card){
+          const r = Math.max(4, w * 0.018);
+          x.save(); x.shadowColor = 'rgba(16,20,43,.28)'; x.shadowBlur = W * 0.04; x.shadowOffsetY = W * 0.018;
+          x.beginPath(); x.roundRect(ox, oy, w, h, r); x.fillStyle = '#fff'; x.fill(); x.restore();
+          x.save(); x.beginPath(); x.roundRect(ox, oy, w, h, r); x.clip(); x.drawImage(img, ox, oy, w, h); x.restore();
+          x.beginPath(); x.roundRect(ox + .5, oy + .5, w - 1, h - 1, r); x.lineWidth = Math.max(1, W / 360); x.strokeStyle = 'rgba(16,20,43,.18)'; x.stroke();
+        } else {
+          x.drawImage(img, ox, oy, w, h);
+        }
+        resolve(cv.toDataURL('image/jpeg', 0.92));
+      } catch (e) { reject(e); }
+    };
+    img.onerror = reject;
+    img.src = src;
+  });
+  NK._padCache.set(key, job);
+  return job;
+};
+NK.applyPadded = function(imgEl, holder, opts){
+  if(!imgEl || imgEl.dataset.padded) return;
+  imgEl.dataset.padded = '1';
+  const src = imgEl.getAttribute('src');
+  NK.padImage(src, opts).then(url => { imgEl.src = url; holder && holder.classList.add('is-padded'); })
+    .catch(() => { delete imgEl.dataset.padded; });
+};

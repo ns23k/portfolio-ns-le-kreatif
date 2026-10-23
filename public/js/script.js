@@ -48,6 +48,7 @@ function buildSlider(){
     s.className = 'slide' + (i === 0 ? ' active' : '') + (['logo','carte'].includes(w.cat) ? ' is-logo' : '') + (w.cat === 'carte' ? ' is-carte' : '') + (w.cat === 'mockup' ? ' is-mockup' : '');
     s.innerHTML = `<img src="${NK.esc(w.src)}" alt="${NK.esc(w.title)}"><div class="slide-caption">${NK.esc(w.title)}</div>`;
     sliderEl.appendChild(s);
+    if(['logo','carte'].includes(w.cat)){ const im = s.querySelector('img'); NK.applyPadded(im, s, { ratio: 280/340, pad: w.cat === 'carte' ? 0.08 : 0.12, card: w.cat === 'carte' }); }
     const d = document.createElement('button');
     d.setAttribute('aria-label', `Visuel ${i + 1}`);
     if(i === 0) d.classList.add('active');
@@ -104,6 +105,7 @@ function card(w, i){
     <div class="thumb" style="--img:url('${NK.esc(w.src)}')"><img src="${NK.esc(w.src)}" alt="${NK.esc(w.title)}" loading="lazy"></div>
     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
     <div class="g-caption"><span class="cat">${NK.esc(w.catLabel)}</span><h4>${NK.esc(w.title)}</h4></div>`;
+  if(['logo','carte'].includes(w.cat)) NK.applyPadded(item.querySelector('.thumb img'), item, { ratio: 4/5, pad: w.cat === 'carte' ? 0.09 : 0.12, card: w.cat === 'carte' });
   item.addEventListener('click', () => openLightbox(w));
   item.addEventListener('keydown', (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openLightbox(w); } });
   return item;
@@ -178,6 +180,11 @@ function openLightbox(w){
   lbImg.src = w.src; lbImg.alt = w.title; lbImg.hidden = false;
   lightbox.classList.toggle('is-logo', ['logo','carte'].includes(w.cat));
   lightbox.classList.toggle('is-carte', w.cat === 'carte');
+  lightbox.classList.remove('is-padded');
+  if(['logo','carte'].includes(w.cat)){
+    const opts = { ratio: w.cat === 'carte' ? 1.45 : 1.15, pad: w.cat === 'carte' ? 0.07 : 0.1, card: w.cat === 'carte', maxW: 1100 };
+    NK.padImage(w.src, opts).then(url => { if(lbTitle.textContent === w.title){ lbImg.src = url; lightbox.classList.add('is-padded'); } }).catch(() => {});
+  }
   lightbox.classList.toggle('is-mockup', w.cat === 'mockup');
   lbTitle.textContent = w.title;
   lbCat.textContent = w.catLabel;

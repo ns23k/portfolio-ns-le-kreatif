@@ -624,11 +624,4 @@ html.dark .g-item.is-logo .thumb{background:#fff;}
 .slide.is-logo img{object-fit:contain; background:#fff; padding:28px;}
 .lightbox.is-logo .lightbox-inner img{object-fit:contain; background:#fff; padding:32px; max-height:65vh;}
 
-/* ---------- Mockups & Branding : image entière, centrée, avec marge ---------- */
-.g-item.is-mockup .thumb{position:relative; display:flex; align-items:center; justify-content:center; padding:9%; isolation:isolate; background:#0B1A38;}
-.g-item.is-mockup .thumb::before{content:""; position:absolute; inset:-12%; z-index:-1; background:var(--img) center/cover no-repeat; filter:blur(22px) saturate(1.15) brightness(.62); transform:scale(1.1);}
-.g-item.is-mockup img{width:auto; height:auto; max-width:100%; max-height:100%; object-fit:contain; border-radius:10px; box-shadow:0 14px 30px -10px rgba(0,0,0,.55);}
-.g-item.is-mockup:hover img{transform:scale(1.035);}
-.slide.is-mockup img{object-fit:contain; background:#0B1A38;}
-.lightbox.is-mockup .lightbox-inner img{object-fit:contain; background:#0B1A38;}
 .logo span::after{content:none; display:none;}

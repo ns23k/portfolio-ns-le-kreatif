@@ -35,7 +35,7 @@ function layout(title, inner) {
       <h2 style="margin:0 0 14px;font-size:19px">${esc(title)}</h2>
       ${inner}
     </div>
-    <p style="font-size:12px;color:#4B5170;text-align:center;margin-top:16px">Ns_le Kréatif — graphiste · designer · photographe — Saint-Louis, Sénégal</p>
+    <p style="font-size:12px;color:#4B5170;text-align:center;margin-top:16px">Ns_le Kréatif — graphiste · designer · photographe — Tivaouane, Sénégal</p>
   </div></body></html>`;
 }
 

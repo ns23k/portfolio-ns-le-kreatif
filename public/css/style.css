@@ -384,7 +384,7 @@ html.dark .lightbox-info .cat{color:var(--accent);}
 }
 .field input:focus, .field select:focus, .field textarea:focus{outline:none; border-color:#0E2A5E; background:#fff; box-shadow:0 0 0 4px color-mix(in srgb, #0E2A5E 12%, transparent);}
 .field textarea{resize:vertical; min-height:100px;}
-.field .err{display:none; color:#E23B3B; font-size:12px; margin-top:6px; font-weight:600;}
+.field .err{display:none; color:#C62828; font-size:12px; margin-top:6px; font-weight:600;}
 .field.invalid input, .field.invalid select, .field.invalid textarea{border-color:#E23B3B; background:#FFF4F4;}
 .field.invalid .err{display:block;}
 .form-submit{width:100%; justify-content:center; margin-top:6px;}
@@ -467,7 +467,7 @@ footer::before{content:""; position:absolute; top:-1px; left:50%; transform:tran
 .g-item:focus-visible .g-caption, .g-item:focus-visible .g-zoom{opacity:1;}
 
 .hp{position:absolute; left:-9999px; width:1px; height:1px; overflow:hidden;}
-.field label em{font-style:normal; text-transform:none; letter-spacing:0; font-weight:500; color:#7A809C;}
+.field label em{font-style:normal; text-transform:none; letter-spacing:0; font-weight:500; color:var(--muted);}
 .form-submit:disabled{opacity:.7; cursor:wait; transform:none;}
 .form-error{display:none; margin-top:14px; background:#FFF4F4; color:#B42323; border-radius:12px; padding:13px 15px; font-size:14px; font-weight:600;}
 .form-error.show{display:block;}
@@ -810,3 +810,12 @@ html.dark .web-body .cat{color:var(--accent);}
 .slide.is-padded img{padding:0 !important; margin:0 !important; max-width:none !important; max-height:none !important; width:100% !important; height:340px !important; object-fit:cover !important; border:0 !important; border-radius:0 !important; box-shadow:none !important;}
 .lightbox.is-padded .lightbox-inner > img{padding:0 !important; margin:0 !important; max-width:100% !important; width:100% !important; max-height:65vh !important; object-fit:contain !important; border:0 !important; border-radius:0 !important; box-shadow:none !important;}
 @media (max-width:720px){ .slide.is-padded img{height:290px !important;} }
+
+/* --- Accessibilité & cartes services (contraste AA, icône à côté du titre) --- */
+.service-head{display:flex; align-items:center; gap:14px; margin-bottom:12px; position:relative; z-index:1;}
+.service-head i{font-size:22px; color:var(--brand); flex-shrink:0; width:26px; text-align:center;}
+html.dark .service-head i{color:var(--accent);}
+.service-card .service-head h3{margin:0;}
+.service-card{padding-top:30px;}
+html.dark .btn-primary, html.dark .filter-btn.active{color:#081226;}
+html.dark .btn-primary i, html.dark .filter-btn.active i{color:#081226;}

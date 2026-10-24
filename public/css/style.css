@@ -819,3 +819,13 @@ html.dark .service-head i{color:var(--accent);}
 .service-card{padding-top:30px;}
 html.dark .btn-primary, html.dark .filter-btn.active{color:#081226;}
 html.dark .btn-primary i, html.dark .filter-btn.active i{color:#081226;}
+
+/* choix d'option sur la page de suivi */
+.opt-choice{border:0; margin:0; padding:0; display:grid; gap:10px; flex:1 1 320px; min-width:0;}
+.opt-choice legend{font-size:13px; font-weight:600; margin-bottom:8px; opacity:.85;}
+.opt-choice .opt{display:flex; gap:12px; align-items:center; padding:12px 14px; border-radius:12px; border:1px solid rgba(255,255,255,.25); cursor:pointer;}
+.opt-choice .opt:has(input:checked){border-color:var(--accent); background:rgba(242,183,5,.12);}
+.opt-choice .opt input{accent-color:var(--accent); width:18px; height:18px; flex-shrink:0;}
+.opt-choice .opt span{display:flex; justify-content:space-between; gap:12px; flex:1; flex-wrap:wrap; align-items:baseline;}
+.opt-choice .opt b{font-weight:600; font-size:14.5px;}
+.opt-choice .opt strong{font-family:var(--font-num, inherit); font-size:18px; white-space:nowrap;}

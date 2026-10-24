@@ -76,7 +76,11 @@ function render({ quote: q, messages }){
     </div>
     ${q.price ? `
       <div class="price-box">
-        <div><small>Montant proposé</small><strong>${NK.fcfa(q.price)}</strong></div>
+        ${canDecide && q.options && q.options.length > 1 ? `
+        <fieldset class="opt-choice">
+          <legend>Choisissez votre option</legend>
+          ${q.options.map((o, i) => `<label class="opt"><input type="radio" name="opt" value="${o.n}" ${i === 0 ? 'checked' : ''}><span><b>Option ${o.n} — ${NK.esc(o.name)}</b><strong>${NK.fcfa(o.price)}</strong></span></label>`).join('')}
+        </fieldset>` : `<div><small>Montant proposé</small><strong>${NK.fcfa(q.price)}</strong></div>`}
         ${canDecide ? `<div class="acts">
           <button class="btn btn-gold" id="accBtn"><i class="fa-solid fa-check"></i> Accepter le devis</button>
           <button class="btn btn-light" id="refBtn">Refuser</button>
@@ -96,7 +100,10 @@ function render({ quote: q, messages }){
   `;
 
   $('accBtn')?.addEventListener('click', () => {
-    if(confirmInline('accBtn', 'Confirmer l\'acceptation')) send('accept');
+    if(confirmInline('accBtn', 'Confirmer l\'acceptation')){
+      const opt = document.querySelector('input[name="opt"]:checked');
+      send('accept', opt ? Number(opt.value) : null);
+    }
   });
   $('refBtn')?.addEventListener('click', () => {
     if(confirmInline('refBtn', 'Confirmer le refus')) send('refuse');
@@ -115,11 +122,11 @@ function confirmInline(id, label){
   return false;
 }
 
-async function send(action){
+async function send(action, option = null){
   const body = ($('rbody')?.value || '').trim();
   if(!action && body.length < 2){ $('rbody').focus(); return; }
   try {
-    await NK.api('/api/track/reply', { method:'POST', body: JSON.stringify({ ...creds, body, action }) });
+    await NK.api('/api/track/reply', { method:'POST', body: JSON.stringify({ ...creds, body, action, ...(option != null ? { option } : {}) }) });
     const data = await NK.api('/api/track', { method:'POST', body: JSON.stringify(creds) });
     render(data);
     $('replyNotice').innerHTML = `<div class="notice ok">${action === 'accept' ? 'Merci ! Devis accepté, je vous contacte pour démarrer.' : action === 'refuse' ? 'C\'est noté. Merci pour votre retour.' : 'Message envoyé.'}</div>`;

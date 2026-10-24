@@ -611,7 +611,75 @@ function waNumber(phone){
 const trackLink = (q) => `${location.origin}/suivi.html?code=${encodeURIComponent(q.code)}`;
 
 function replyText(q, body, price){
+  if(body.includes(q.code)) return body; // la proposition contient déjà lien, code et signature
   return `${body}${price ? `\n\nMontant proposé : ${fcfa(price)}` : ''}\n\nVous pouvez accepter le devis ou me répondre ici : ${trackLink(q)}\n(code ${q.code})\n\nNs_le Kréatif`;
+}
+
+
+/* ============================================
+   PROPOSITIONS DE PRIX — un modèle par type de projet
+   (modifie librement les prix, contenus et délais ici)
+============================================ */
+const SIGNATURE = 'Niaye Sall — Ns_le Kréatif\nGraphiste · Designer web · Photographe\n📞 78 586 36 68';
+const PAY_NUMBER = '78 586 36 68';
+const PRICING = {
+  'Affiche': { noun: 'votre affiche', delay: '3 jours', needs: "les textes de l'affiche, votre logo (si vous en avez un) et les photos éventuelles", options: [
+    ['Affiche simple', 20000, ['1 affiche format A3 (impression) + version HD pour les réseaux', '2 séries de retouches incluses']],
+    ['Pack visibilité', 25000, ["L'affiche A3 + version HD", 'Déclinaisons statut WhatsApp et story Instagram', '3 séries de retouches incluses']],
+  ]},
+  'Logo': { noun: 'votre logo', delay: '5 jours', needs: "le nom exact de votre structure, votre activité, vos couleurs préférées et des exemples de logos que vous aimez", options: [
+    ['Logo essentiel', 35000, ['2 pistes de logo au choix', 'Versions couleur, noir et blanc', 'Fichiers PNG, JPG et PDF haute définition', '2 séries de retouches incluses']],
+    ['Logo + carte de visite', 50000, ['Le logo complet (2 pistes, toutes les versions)', 'Carte de visite recto-verso prête à imprimer', '3 séries de retouches incluses']],
+  ]},
+  'Carte de visite': { noun: 'votre carte de visite', delay: '2 jours', needs: "votre logo, vos nom et fonction, téléphone, email, adresse et réseaux sociaux à faire figurer", options: [
+    ['Carte recto-verso', 10000, ['Carte de visite recto-verso, format standard 85 × 55 mm', 'Fichier PDF prêt pour l’imprimeur', '2 séries de retouches incluses']],
+    ['Carte + QR code', 15000, ['La carte recto-verso', 'QR code vers votre WhatsApp ou votre site', 'Version numérique à partager sur WhatsApp', '3 séries de retouches incluses']],
+  ]},
+  'Brochure': { noun: 'votre brochure', delay: '5 jours', needs: "les textes, votre logo, les photos et le nombre de pages souhaité", options: [
+    ['Dépliant 3 volets', 30000, ['Dépliant A4 3 volets recto-verso', 'Fichier PDF prêt pour l’imprimeur', '2 séries de retouches incluses']],
+    ['Brochure jusqu’à 8 pages', 50000, ['Brochure A4 ou A5 jusqu’à 8 pages', 'Mise en page complète + PDF imprimeur et version écran', '3 séries de retouches incluses']],
+  ]},
+  'Design sport': { noun: 'votre visuel sportif', delay: '24 heures', needs: "les équipes, la date, l'heure, le lieu, les logos et les photos des joueurs", options: [
+    ['Visuel de match', 10000, ['1 visuel affiche de match (format réseaux + statut)', '1 série de retouches incluse']],
+    ['Pack match', 25000, ['Annonce du match + composition d’équipe + score final', 'Formats publication et statut WhatsApp', '2 séries de retouches incluses']],
+  ]},
+  'Identité visuelle': { noun: 'votre identité visuelle', delay: '10 jours', needs: "le nom de votre structure, votre activité, votre cible, vos valeurs et des exemples de marques que vous aimez", options: [
+    ['Identité essentielle', 80000, ['Logo (2 pistes) + palette de couleurs + typographies', 'Mini charte graphique PDF', '3 séries de retouches incluses']],
+    ['Identité complète', 150000, ['Logo, couleurs et typographies', 'Charte graphique complète', 'Carte de visite, papier en-tête et 3 visuels réseaux sociaux', '3 séries de retouches incluses']],
+  ]},
+  'Charte graphique': { noun: 'votre charte graphique', delay: '7 jours', needs: "votre logo actuel (fichier source si possible), vos couleurs et des exemples de supports que vous utilisez", options: [
+    ['Charte essentielle', 60000, ['Règles du logo, couleurs et typographies', 'Charte PDF de 8 à 10 pages', '2 séries de retouches incluses']],
+    ['Charte complète + supports', 120000, ['Charte PDF complète (15 pages et plus)', 'Modèles de supports : carte de visite, papier en-tête, visuels réseaux', '3 séries de retouches incluses']],
+  ]},
+  'Site web': { noun: 'votre site web', delay: '2 à 3 semaines', needs: "les textes de chaque page, votre logo, vos photos et des exemples de sites que vous aimez", deposit: 50, options: [
+    ['Site vitrine', 150000, ['Site de 1 à 5 pages adapté mobile', 'Formulaire de contact + bouton WhatsApp', 'Mise en ligne et référencement de base', '1 mois de corrections après livraison']],
+    ['Site avec fonctionnalités', 250000, ['Le site vitrine complet', 'Fonctionnalité sur mesure (réservation, catalogue ou espace admin)', 'Formation à la gestion du site', '1 mois de corrections après livraison']],
+  ]},
+  'Photographie': { noun: 'votre séance photo', delay: '3 jours après la séance', needs: "le type de photos voulu (produits, portraits, évènement), le lieu et les dates possibles", options: [
+    ['Séance essentielle', 15000, ['Séance d’environ 1 heure', 'Jusqu’à 10 photos retouchées en haute définition']],
+    ['Séance complète', 30000, ['Séance d’environ 2 heures, jusqu’à 2 lieux', 'Jusqu’à 25 photos retouchées en haute définition']],
+  ]},
+};
+const PRICING_TYPES = Object.keys(PRICING);
+function proposalFor(q, type){
+  const first = q.name.split(' ')[0];
+  const conf = PRICING[type];
+  const link = trackLink(q);
+  const fmt = (n) => n.toLocaleString('fr-FR').replace(/ | /g, ' ') + ' FCFA';
+  const opts = conf
+    ? conf.options.map(([name, price, items], i) => `Option ${i + 1} — ${name} : ${fmt(price)}\n${items.map(t => '• ' + t).join('\n')}`).join('\n\n')
+    : 'Option 1 — [Nom] : [Prix] FCFA\n• [Contenu]\n\nOption 2 — [Nom] : [Prix] FCFA\n• [Contenu]';
+  const noun = conf ? conf.noun : `votre projet (${q.projectType.toLowerCase()})`;
+  const deposit = conf?.deposit || 50;
+  return {
+    price: conf ? conf.options[0][1] : null,
+    text: `Bonjour ${first},\n\nMerci pour votre confiance ! Voici ma proposition pour ${noun} :\n\n${opts}\n\n`
+      + `Délai : ${conf ? conf.delay : '[délai]'} après réception de vos éléments.\n`
+      + `Pour commencer, merci de m'envoyer : ${conf ? conf.needs : '[éléments nécessaires]'}.\n\n`
+      + `Paiement : ${deposit} % à la commande, le reste à la livraison des fichiers finaux.\nWave / Orange Money : ${PAY_NUMBER}\n\n`
+      + `Ce devis est valable 7 jours. Vous pouvez l'accepter ou me poser vos questions ici :\n${link}\n(code ${q.code})\n\n`
+      + `Au plaisir de travailler avec vous,\n${SIGNATURE}`,
+  };
 }
 
 async function openQuote(id){
@@ -629,7 +697,6 @@ async function openQuote(id){
   const wa = waNumber(q.phone);
   const QUICK = [
     ['Accusé de réception', `Bonjour ${first},\n\nMerci pour votre demande ! Je l'étudie et je reviens vers vous très vite avec une proposition.`],
-    ['Proposition de prix', `Bonjour ${first},\n\nMerci pour votre confiance. Pour votre ${q.projectType.toLowerCase()}, je vous propose :\n– \n– \n\nDélai de réalisation : \nRetouches incluses : 2\n\nPaiement : 50 % à la commande (Wave / Orange Money), le reste à la livraison.`],
     ['Besoin de précisions', `Bonjour ${first},\n\nMerci pour votre demande. Pour vous faire une proposition juste, pourriez-vous me préciser :\n– le format et le support (réseaux sociaux, impression…)\n– les textes et informations à intégrer\n– vos couleurs ou références préférées`],
     ['Projet livré', `Bonjour ${first},\n\nVotre projet est terminé, vous trouverez les fichiers finaux ici : \n\nMerci pour votre confiance, au plaisir de travailler à nouveau ensemble !`],
   ];
@@ -666,6 +733,14 @@ async function openQuote(id){
     </div>
     <form class="composer" id="replyForm" novalidate>
       <h3>Répondre à ${esc(first)}</h3>
+      <div class="proposal">
+        <div class="proposal-head"><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i><div><b>Proposition de prix</b><small>Modèle adapté au projet, avec 2 options, délai, paiement et lien de suivi</small></div></div>
+        <div class="proposal-row">
+          <label class="sr-only" for="ptype">Type de prestation</label>
+          <select id="ptype">${PRICING_TYPES.map(t => `<option ${t === q.projectType ? 'selected' : ''}>${t}</option>`).join('')}<option value="__other" ${PRICING[q.projectType] ? '' : 'selected'}>Autre (modèle vierge)</option></select>
+          <button type="button" class="btn btn-gold btn-sm" id="pfill"><i class="fa-solid fa-wand-magic-sparkles"></i> Préparer la proposition</button>
+        </div>
+      </div>
       <div class="quick">${QUICK.map(([l], i) => `<button type="button" data-tpl="${i}"><i class="fa-solid fa-bolt"></i> ${l}</button>`).join('')}</div>
       <div class="field"><textarea id="rbody" placeholder="Ta réponse au client…" maxlength="5000"></textarea><span class="err">Écris une réponse.</span></div>
       <div class="row2">
@@ -697,6 +772,18 @@ async function openQuote(id){
     const t = $('#rbody'); t.value = QUICK[Number(b.dataset.tpl)][1]; t.focus();
     const pos = t.value.indexOf('– \n'); if(pos > -1) t.setSelectionRange(pos + 2, pos + 2);
   }));
+  $('#pfill').addEventListener('click', () => {
+    const t = $('#rbody');
+    if(t.value.trim() && !confirm('Remplacer le texte déjà écrit par la proposition ?')) return;
+    const type = $('#ptype').value;
+    const p = proposalFor(q, type === '__other' ? q.projectType : type);
+    t.value = p.text;
+    if(p.price) $('#rprice').value = p.price.toLocaleString('fr-FR').replace(/\u202f|\u00a0/g, ' ');
+    $('#rstatus').value = 'devis_envoye';
+    t.style.height = 'auto'; t.style.height = Math.min(720, t.scrollHeight + 4) + 'px';
+    t.focus(); t.setSelectionRange(0, 0); t.scrollTop = 0;
+    toast('Proposition prête — vérifie les prix avant d’envoyer');
+  });
   $('#copyLink').addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(trackLink(q)); toast('Lien de suivi copié'); }
     catch { prompt('Lien de suivi :', trackLink(q)); }

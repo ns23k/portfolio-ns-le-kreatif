@@ -151,12 +151,30 @@ async function findTracked(code, email) {
   return rows[0] || null;
 }
 
+// Options « Option N — Nom : 20 000 FCFA » lues dans la dernière proposition de l'admin
+function parseOptions(text) {
+  const out = [];
+  const re = /^Option\s+(\d+)\s*[—–-]\s*(.+?)\s*:\s*([\d\s\u00a0\u202f.]+)\s*F\s?CFA/gim;
+  let m;
+  while ((m = re.exec(String(text || '')))) {
+    const price = Number(m[3].replace(/[^\d]/g, ''));
+    if (price > 0) out.push({ n: Number(m[1]), name: m[2].trim().slice(0, 120), price });
+  }
+  return out;
+}
+async function lastOptions(quoteId) {
+  const rows = await query('SELECT body FROM quote_messages WHERE quote_id = ? AND author = "admin" ORDER BY created_at DESC, id DESC LIMIT 1', [quoteId]);
+  return rows[0] ? parseOptions(rows[0].body) : [];
+}
+
 app.post('/api/track', rateLimit('track', 30, 10 * 60 * 1000), wrap(async (req, res) => {
   const q = await findTracked(req.body?.code, req.body?.email);
   if (!q) return res.status(404).json({ error: 'Aucune demande trouvée avec ce code et cet email.' });
   const msgs = await query('SELECT * FROM quote_messages WHERE quote_id = ? ORDER BY created_at ASC, id ASC', [q.id]);
   const out = quoteOut(q);
   delete out.unread;
+  const lastAdmin = [...msgs].reverse().find((m) => m.author === 'admin');
+  out.options = lastAdmin ? parseOptions(lastAdmin.body) : [];
   res.json({ quote: out, messages: msgs.map(msgOut) });
 }));
 
@@ -170,6 +188,16 @@ app.post('/api/track/reply', rateLimit('trackreply', 10, 10 * 60 * 1000), wrap(a
     return res.status(409).json({ error: 'Cette demande ne peut plus être acceptée ou refusée.' });
   }
   if (action && !q.price) return res.status(409).json({ error: "Aucun montant n'a encore été proposé." });
+  let chosen = null;
+  if (action === 'accept' && req.body?.option != null) {
+    const opts = await lastOptions(q.id);
+    chosen = opts.find((o) => o.n === Number(req.body.option)) || null;
+    if (opts.length && !chosen) return res.status(422).json({ error: 'Option inconnue.' });
+  }
+  if (chosen) {
+    await query('UPDATE quotes SET price = ? WHERE id = ?', [chosen.price, q.id]);
+    body = `Option ${chosen.n} — ${chosen.name} (${chosen.price.toLocaleString('fr-FR')} FCFA)${body ? ' — ' + body : ''}`;
+  }
   if (action === 'accept') body = `✅ Devis accepté${body ? ' — ' + body : ''}`;
   if (action === 'refuse') body = `❌ Devis refusé${body ? ' — ' + body : ''}`;
   await query('INSERT INTO quote_messages (quote_id, author, body) VALUES (?, "client", ?)', [q.id, body]);

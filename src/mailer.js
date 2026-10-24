@@ -76,7 +76,7 @@ async function notifyReply(q, body, price) {
   return send(q.email, `Réponse à votre demande de devis ${q.code}`, layout('Réponse à votre demande', `
     <p>Bonjour ${esc(q.name)},</p>
     <div style="background:#F5F6FA;border-radius:10px;padding:14px">${nl2br(body)}</div>
-    ${price ? `<p style="font-size:17px">Montant proposé : <b>${fcfa(price)}</b></p>` : ''}
+    ${price ? `<p style="font-size:17px">${/^Option\s+2/im.test(body) ? 'À partir de' : 'Montant proposé :'} <b>${fcfa(price)}</b></p>` : ''}
     <p>Vous pouvez accepter le devis ou me répondre directement depuis votre espace de suivi :</p>
     <p><a href="${trackUrl(q.code)}" style="background:#0E2A5E;color:#fff;padding:11px 18px;border-radius:30px;text-decoration:none;font-weight:bold">Voir et répondre</a></p>
     <p style="color:#4B5170;font-size:13px">Code de suivi : ${esc(q.code)}</p>`));

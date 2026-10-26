@@ -829,3 +829,8 @@ html.dark .btn-primary i, html.dark .filter-btn.active i{color:#081226;}
 .opt-choice .opt span{display:flex; justify-content:space-between; gap:12px; flex:1; flex-wrap:wrap; align-items:baseline;}
 .opt-choice .opt b{font-weight:600; font-size:14.5px;}
 .opt-choice .opt strong{font-family:var(--font-num, inherit); font-size:18px; white-space:nowrap;}
+
+/* Chiffres clés : même bloc foncé en mode clair et sombre (lisible sur le bas clair du hero) */
+.hero-stats{background:#162038; border-color:rgba(255,255,255,.12); backdrop-filter:none; box-shadow:0 18px 40px -22px rgba(8,18,38,.55);}
+.hero-stats div{border-right-color:rgba(255,255,255,.12);}
+.hero-stats div span{color:#C9D1EA;}

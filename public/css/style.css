@@ -839,7 +839,7 @@ html.dark .btn-primary i, html.dark .filter-btn.active i{color:#081226;}
    MODE CLAIR COMPLET — tout le site passe en clair,
    textes et blocs suivent le thème choisi
 ===================================================== */
-:root{ --accent-ink:#9A6B00; }            /* or foncé lisible sur fond clair */
+:root{ --accent-ink:var(--accent); }            /* mots mis en valeur : jaune de la marque, dans les deux modes */
 html:not(.dark){ background:var(--bg); }
 html:not(.dark) body{ background:var(--bg); }
 
@@ -879,3 +879,5 @@ html:not(.dark) .price-box .btn-light{ background:var(--surface-2); color:var(--
 html:not(.dark) .opt-choice .opt{ border-color:var(--border); }
 html:not(.dark) .opt-choice .opt:has(input:checked){ border-color:var(--accent-ink); background:color-mix(in srgb, var(--accent) 14%, transparent); }
 html:not(.dark) .opt-choice .opt strong{ color:var(--text); }
+/* Tous les mots mis en couleur du site en jaune, mode clair compris */
+.mark, html.dark .mark, html:not(.dark) .mark{ color:var(--accent); }

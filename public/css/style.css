@@ -834,3 +834,48 @@ html.dark .btn-primary i, html.dark .filter-btn.active i{color:#081226;}
 .hero-stats{background:#162038; border-color:rgba(255,255,255,.12); backdrop-filter:none; box-shadow:0 18px 40px -22px rgba(8,18,38,.55);}
 .hero-stats div{border-right-color:rgba(255,255,255,.12);}
 .hero-stats div span{color:#C9D1EA;}
+
+/* =====================================================
+   MODE CLAIR COMPLET — tout le site passe en clair,
+   textes et blocs suivent le thème choisi
+===================================================== */
+:root{ --accent-ink:#9A6B00; }            /* or foncé lisible sur fond clair */
+html:not(.dark){ background:var(--bg); }
+html:not(.dark) body{ background:var(--bg); }
+
+/* Hero (accueil) et en-tête de la page de suivi */
+html:not(.dark) .hero h1,
+html:not(.dark) .track-hero h1{ color:var(--text); }
+html:not(.dark) .hero h1 .mark,
+html:not(.dark) .track-hero h1 .mark,
+html:not(.dark) .quote-left .mark{ color:var(--accent-ink); }
+html:not(.dark) .hero p.lead,
+html:not(.dark) .track-hero p{ color:var(--muted); }
+html:not(.dark) .hero .eyebrow,
+html:not(.dark) .track-hero .eyebrow,
+html:not(.dark) .quote-left .eyebrow{ background:var(--surface); color:var(--text); border:1px solid var(--border); }
+html:not(.dark) .hero .btn-ghost{ border-color:var(--border); color:var(--text); background:var(--surface); }
+html:not(.dark) .hero .btn-ghost:hover{ border-color:var(--brand); color:var(--brand); }
+
+/* Chiffres clés */
+html:not(.dark) .hero-stats{ background:var(--surface); border-color:var(--border); box-shadow:var(--shadow-sm); }
+html:not(.dark) .hero-stats div{ border-right-color:var(--border); }
+html:not(.dark) .hero-stats div strong{ color:var(--accent-ink); }
+html:not(.dark) .hero-stats div span{ color:var(--muted); }
+
+/* Bloc devis / contact */
+html:not(.dark) .quote-wrap{ background:var(--surface); color:var(--text); border:1px solid var(--border); box-shadow:var(--shadow); }
+html:not(.dark) .quote-wrap::before{ background:color-mix(in srgb, var(--accent) 22%, transparent); }
+html:not(.dark) .quote-wrap::after{ box-shadow:none; }
+html:not(.dark) .quote-left p{ color:var(--muted); opacity:1; }
+html:not(.dark) .quote-contact i,
+html:not(.dark) .quote-social a{ background:var(--surface-2); color:var(--brand); }
+html:not(.dark) .quote-social a:hover{ background:var(--accent); color:#141414; }
+html:not(.dark) .form-card{ background:var(--surface-2); box-shadow:none; border:1px solid var(--border); }
+
+/* Page de suivi : encadré du montant */
+html:not(.dark) .price-box{ background:var(--surface); color:var(--text); border:1px solid var(--border); box-shadow:var(--shadow-sm); }
+html:not(.dark) .price-box .btn-light{ background:var(--surface-2); color:var(--text); border-color:var(--border); }
+html:not(.dark) .opt-choice .opt{ border-color:var(--border); }
+html:not(.dark) .opt-choice .opt:has(input:checked){ border-color:var(--accent-ink); background:color-mix(in srgb, var(--accent) 14%, transparent); }
+html:not(.dark) .opt-choice .opt strong{ color:var(--text); }

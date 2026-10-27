@@ -47,6 +47,38 @@ async function migrate(log) {
   await query('CREATE TABLE IF NOT EXISTS meta (k VARCHAR(64) PRIMARY KEY, v VARCHAR(255) NULL) DEFAULT CHARSET = utf8mb4');
   await addColumnIfMissing('works', 'link_url', 'VARCHAR(500) NULL');
   await addColumnIfMissing('works', 'tags', 'VARCHAR(300) NULL');
+  await addColumnIfMissing('works', 'pages', 'MEDIUMTEXT NULL'); // pages d'une charte graphique (JSON)
+
+  // Chartes importées image par image (« Titre — 1 », « Titre — 2 »…) → un seul projet par charte
+  const merged = await query("SELECT v FROM meta WHERE k = 'merge_charte_v1'");
+  if (!merged.length) {
+    const rows = await query("SELECT * FROM works WHERE cat = 'charte' ORDER BY position ASC, id ASC");
+    const groups = new Map();
+    for (const w of rows) {
+      const m = String(w.title).match(/^(.*?)\s*[—–-]\s*(\d+)$/);
+      const base = (m ? m[1] : w.title).trim();
+      if (!groups.has(base)) groups.set(base, []);
+      groups.get(base).push({ w, n: m ? Number(m[2]) : 0 });
+    }
+    let count = 0;
+    for (const [base, items] of groups) {
+      if (items.length < 2) continue;
+      items.sort((a, b) => a.n - b.n || a.w.id - b.w.id);
+      const keep = items[0].w;
+      const pages = items.map((it) => it.w.image_url);
+      const mm = String(pages[0]).match(/^\/api\/media\/(\d+)$/);
+      await query(
+        'UPDATE works SET title = ?, image_url = ?, media_id = ?, pages = ?, position = ?, published = ?, featured = ? WHERE id = ?',
+        [base, pages[0], mm ? Number(mm[1]) : null, JSON.stringify(pages),
+          Math.min(...items.map((it) => Number(it.w.position))),
+          items.some((it) => it.w.published) ? 1 : 0, items.some((it) => it.w.featured) ? 1 : 0, keep.id]);
+      const others = items.slice(1).map((it) => it.w.id);
+      if (others.length) await query(`DELETE FROM works WHERE id IN (${others.map(() => '?').join(',')})`, others);
+      count++;
+    }
+    await query("INSERT INTO meta (k, v) VALUES ('merge_charte_v1', 'ok')");
+    if (count) log(`✔ ${count} charte(s) graphique(s) regroupée(s) en un seul projet chacune`);
+  }
 
   const done = await query("SELECT v FROM meta WHERE k = 'seed_web_v1'");
   if (!done.length) {

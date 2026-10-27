@@ -881,3 +881,13 @@ html:not(.dark) .opt-choice .opt:has(input:checked){ border-color:var(--accent-i
 html:not(.dark) .opt-choice .opt strong{ color:var(--text); }
 /* Tous les mots mis en couleur du site en jaune, mode clair compris */
 .mark, html.dark .mark, html:not(.dark) .mark{ color:var(--accent); }
+
+/* Chartes graphiques : un projet, plusieurs pages */
+.g-pages{position:absolute; top:14px; left:14px; z-index:3; display:inline-flex; align-items:center; gap:6px; background:rgba(8,15,35,.82); color:#fff; font-size:12px; font-weight:600; padding:6px 11px; border-radius:100px; backdrop-filter:blur(4px);}
+.lb-stage{position:relative;}
+.lightbox.is-multi .lightbox-inner{max-width:760px;}
+.lightbox.is-multi .lightbox-inner img{object-fit:contain; background:var(--surface-2); max-height:70vh;}
+.lb-nav{position:absolute; top:50%; transform:translateY(-50%); width:44px; height:44px; border-radius:50%; border:none; background:rgba(255,255,255,.94); color:#10142B; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 18px rgba(0,0,0,.28); z-index:4;}
+.lb-nav.prev{left:12px;} .lb-nav.next{right:12px;}
+.lb-nav:hover{background:var(--accent);}
+.lb-count{position:absolute; bottom:12px; left:50%; transform:translateX(-50%); background:rgba(8,15,35,.82); color:#fff; font-family:var(--font-num, inherit); font-size:15px; padding:4px 14px; border-radius:100px; z-index:4;}

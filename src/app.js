@@ -59,8 +59,15 @@ function rateLimit(key, limit, windowMs) {
   };
 }
 
+function pagesOf(w) {
+  try { const a = JSON.parse(w.pages || '[]'); if (Array.isArray(a) && a.length) return a; } catch {}
+  return [w.image_url];
+}
+const SRC_RE = /^(\/images\/|\/api\/media\/\d+$|https:\/\/)/;
+const mediaIdOf = (src) => { const m = String(src || '').match(/^\/api\/media\/(\d+)$/); return m ? Number(m[1]) : null; };
 function publicWork(w) {
   return {
+    pages: pagesOf(w),
     id: w.id, title: w.title, cat: w.cat, catLabel: w.cat_label, description: w.description,
     src: w.image_url, featured: !!w.featured,
     link: w.link_url || null,
@@ -323,6 +330,14 @@ function readWork(b, partial = false) {
     const m = out.image_url.match(/^\/api\/media\/(\d+)$/);
     out.media_id = m ? Number(m[1]) : null;
   }
+  if ('pages' in b) {
+    const list = Array.isArray(b.pages) ? b.pages.map((x) => str(x, 500)).filter(Boolean).slice(0, 60) : [];
+    if (list.some((x) => !SRC_RE.test(x))) errors.pages = 'Page invalide.';
+    else if (list.length > 1) {
+      out.pages = JSON.stringify(list);
+      out.image_url = list[0]; out.media_id = mediaIdOf(list[0]); delete errors.src;
+    } else out.pages = null;
+  }
   if ('featured' in b) out.featured = b.featured ? 1 : 0;
   if ('published' in b) out.published = b.published ? 1 : 0;
   return { data: out, errors };
@@ -330,9 +345,11 @@ function readWork(b, partial = false) {
 
 async function cleanupMedia(mediaId) {
   if (!mediaId) return;
-  const [{ n }] = await query('SELECT COUNT(*) AS n FROM works WHERE media_id = ?', [mediaId]);
+  const [{ n }] = await query('SELECT COUNT(*) AS n FROM works WHERE media_id = ? OR image_url = ? OR pages LIKE ?',
+    [mediaId, `/api/media/${mediaId}`, `%"/api/media/${mediaId}"%`]);
   if (Number(n) === 0) await query('DELETE FROM media WHERE id = ?', [mediaId]);
 }
+const allMediaIds = (w) => [...new Set([w.media_id, ...pagesOf(w).map(mediaIdOf)].filter(Boolean))];
 
 admin.get('/works', wrap(async (req, res) => {
   const rows = await query('SELECT * FROM works ORDER BY position ASC, id ASC');
@@ -360,8 +377,9 @@ admin.put('/works/:id', wrap(async (req, res) => {
   const { data, errors } = readWork(req.body || {}, true);
   if (Object.keys(errors).length) return res.status(422).json({ error: 'Champs invalides.', fields: errors });
   if (Object.keys(data).length) await query('UPDATE works SET ? WHERE id = ?', [data, id]);
-  if ('image_url' in data && before.media_id && before.media_id !== data.media_id) await cleanupMedia(before.media_id);
   const [w] = await query('SELECT * FROM works WHERE id = ?', [id]);
+  const keep = new Set(allMediaIds(w));
+  for (const mid of allMediaIds(before)) if (!keep.has(mid)) await cleanupMedia(mid);
   res.json({ work: adminWork(w) });
 }));
 
@@ -370,7 +388,7 @@ admin.delete('/works/:id', wrap(async (req, res) => {
   const [w] = await query('SELECT * FROM works WHERE id = ?', [id]);
   if (!w) return res.status(404).json({ error: 'Création introuvable.' });
   await query('DELETE FROM works WHERE id = ?', [id]);
-  await cleanupMedia(w.media_id);
+  for (const mid of allMediaIds(w)) await cleanupMedia(mid);
   res.json({ ok: true });
 }));
 

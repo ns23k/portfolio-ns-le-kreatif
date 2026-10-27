@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="css/admin.css?v=202610261130">
+<link rel="stylesheet" href="css/admin.css?v=202610271000">
 <script>try{var t=localStorage.getItem('nk-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}</script>
 </head>
 <body>
@@ -196,6 +196,12 @@
         </label>
         <input type="file" id="wfile" accept="image/jpeg,image/png,image/webp,image/gif" hidden multiple>
         <div class="upl" id="uplInfo">L'image est optimisée automatiquement avant l'envoi.</div>
+        <div class="pages-box" id="pagesBox" hidden>
+          <div class="pages-head"><b id="pagesCount">Pages de la charte</b><small>La 1<sup>re</sup> page sert de couverture. Change l'ordre avec les flèches.</small></div>
+          <ol class="pages-list" id="pagesList"></ol>
+          <button type="button" class="btn btn-ghost btn-sm" id="pagesAdd"><i class="fa-solid fa-plus"></i> Ajouter des pages</button>
+          <input type="file" id="pagesFile" accept="image/jpeg,image/png,image/webp" multiple hidden>
+        </div>
       </div>
       <div>
         <div class="field">
@@ -245,6 +251,6 @@
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="js/admin.js?v=202610261130"></script>
+<script src="js/admin.js?v=202610271000"></script>
 </body>
 </html>

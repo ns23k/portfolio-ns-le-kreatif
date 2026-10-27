@@ -230,6 +230,7 @@ function renderWorks(){
         <div class="wbadges">
           ${w.featured ? '<span class="wbadge star"><i class="fa-solid fa-star"></i> Accueil</span>' : ''}
           ${w.published ? '' : '<span class="wbadge"><i class="fa-solid fa-eye-slash"></i> Masquée</span>'}
+          ${w.pages && w.pages.length > 1 ? `<span class="wbadge"><i class="fa-solid fa-layer-group"></i> ${w.pages.length} pages</span>` : ''}
         </div>
         ${reorder ? `<span class="handle" draggable="true" title="Glisser pour déplacer" aria-hidden="true"><i class="fa-solid fa-grip-vertical"></i></span>
           <div class="move-btns"><button class="icon-btn" data-move="-1" aria-label="Avancer"><i class="fa-solid fa-arrow-left"></i></button><button class="icon-btn" data-move="1" aria-label="Reculer"><i class="fa-solid fa-arrow-right"></i></button></div>` : ''}
@@ -384,7 +385,7 @@ function setPreview(src){
 
 function openWork(w = null){
   editing = w; pendingBlob = null; pendingBlobs = []; currentSrc = w?.src || '';
-  $('#wfile').multiple = !w;
+  $('#wfile').multiple = true;
   $('#dropTitle').textContent = w ? 'Choisir une image' : 'Choisir une ou plusieurs images';
   $('#dropHint').textContent = w ? 'ou glisse-la ici · JPG, PNG, WEBP' : 'ou glisse-les ici · JPG, PNG, WEBP';
   $('#workDlgTitle').textContent = w ? 'Modifier la création' : 'Nouvelle création';
@@ -402,12 +403,78 @@ function openWork(w = null){
   $('#uplInfo').textContent = "L'image est optimisée automatiquement avant l'envoi.";
   $('#wtitle').closest('.field').classList.remove('invalid');
   setPreview(currentSrc);
+  pagesState = w && w.cat === 'charte' ? (w.pages && w.pages.length ? w.pages : [w.src]).map(src => ({ src })) : [];
+  renderPages();
   dlg.showModal();
   setTimeout(() => (w ? $('#wtitle') : $('#drop')).focus(), 30);
 }
 
-$('#wcat').addEventListener('change', () => { if($('#wlabel').dataset.auto) $('#wlabel').value = state.categories[$('#wcat').value] || ''; toggleWebFields(); });
+$('#wcat').addEventListener('change', () => {
+  if($('#wlabel').dataset.auto) $('#wlabel').value = state.categories[$('#wcat').value] || '';
+  toggleWebFields();
+  if(isCharte() && !pagesState.length){
+    // images déjà choisies → elles deviennent les pages de la charte
+    if(pendingBlobs.length) pagesState = pendingBlobs.map(blob => ({ blob, url: URL.createObjectURL(blob) }));
+    else if(pendingBlob) pagesState = [{ blob: pendingBlob, url: URL.createObjectURL(pendingBlob) }];
+    else if(currentSrc) pagesState = [{ src: currentSrc }];
+    pendingBlobs = []; pendingBlob = null;
+  } else if(!isCharte() && pagesState.length){
+    const first = pagesState[0]; pagesState = [];
+    if(first.blob){ pendingBlob = first.blob; currentSrc = ''; } else currentSrc = first.src;
+    setPreview(first.url || first.src);
+  }
+  renderPages();
+});
 let pendingBlobs = [];
+
+/* ----- chartes graphiques : un projet = plusieurs pages ----- */
+let pagesState = [];           // [{ src } (déjà en ligne) | { blob, url } (à envoyer)]
+const isCharte = () => $('#wcat').value === 'charte';
+function renderPages(){
+  const box = $('#pagesBox');
+  box.hidden = !isCharte();
+  if(box.hidden) return;
+  const n = pagesState.length;
+  $('#pagesCount').textContent = n ? `${n} page${n > 1 ? 's' : ''} dans cette charte` : 'Aucune page pour le moment';
+  $('#pagesList').innerHTML = pagesState.map((p, i) => `
+    <li>
+      <img src="${esc(p.url || p.src)}" alt="Page ${i + 1}">
+      <span class="pg-num">${i === 0 ? '1 · Couv.' : i + 1}</span>
+      <span class="pg-acts">
+        <button type="button" data-pg-left="${i}" aria-label="Avancer la page ${i + 1}" ${i === 0 ? 'disabled' : ''}><i class="fa-solid fa-arrow-left"></i></button>
+        <button type="button" data-pg-right="${i}" aria-label="Reculer la page ${i + 1}" ${i === n - 1 ? 'disabled' : ''}><i class="fa-solid fa-arrow-right"></i></button>
+        <button type="button" data-pg-del="${i}" aria-label="Retirer la page ${i + 1}"><i class="fa-solid fa-xmark"></i></button>
+      </span>
+    </li>`).join('');
+  setPreview(n ? (pagesState[0].url || pagesState[0].src) : '');
+  if(n > 1) $('#drop .change').innerHTML = '<i class="fa-solid fa-images"></i> Ajouter des pages';
+}
+$('#pagesList').addEventListener('click', (e) => {
+  const b = e.target.closest('button'); if(!b) return;
+  const swap = (a, c) => { [pagesState[a], pagesState[c]] = [pagesState[c], pagesState[a]]; };
+  if(b.dataset.pgLeft) swap(+b.dataset.pgLeft, +b.dataset.pgLeft - 1);
+  else if(b.dataset.pgRight) swap(+b.dataset.pgRight, +b.dataset.pgRight + 1);
+  else if(b.dataset.pgDel) pagesState.splice(+b.dataset.pgDel, 1);
+  renderPages();
+});
+async function addPages(list){
+  const files = [...(list || [])].filter(f => /^image\/(jpeg|png|webp|gif)$/.test(f.type))
+    .sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
+  if(!files.length) return;
+  if(pagesState.length + files.length > 60){ toast('60 pages maximum par charte.', true); return; }
+  try {
+    for(let i = 0; i < files.length; i++){
+      $('#uplInfo').textContent = `Optimisation ${i + 1}/${files.length}…`;
+      const blob = await optimise(files[i]);
+      pagesState.push({ blob, url: URL.createObjectURL(blob) });
+    }
+    $('#uplInfo').textContent = `${pagesState.length} page(s) — tout sera enregistré comme un seul projet.`;
+    if(!$('#wtitle').value) $('#wtitle').value = files[0].name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').replace(/\s*\d+$/, '').trim();
+  } catch (err) { toast(err.message, true); }
+  renderPages();
+}
+$('#pagesAdd').addEventListener('click', () => $('#pagesFile').click());
+$('#pagesFile').addEventListener('change', (e) => { addPages(e.target.files); e.target.value = ''; });
 
 /* ----- réalisations web : lien, technologies, capture automatique ----- */
 function toggleWebFields(){ $('#webFields').hidden = $('#wcat').value !== 'web'; }
@@ -467,6 +534,7 @@ async function pickFile(file){
   } catch (err) { toast(err.message, true); $('#uplInfo').textContent = ''; }
 }
 async function pickFiles(list){
+  if(isCharte()) return addPages(list);
   const files = [...(list || [])];
   if(files.length <= 1 || editing){ pendingBlobs = []; return pickFile(files[0]); }
   const ok = files.filter(f => /^image\/(jpeg|png|webp|gif)$/.test(f.type));
@@ -504,13 +572,45 @@ $('#workForm').addEventListener('submit', async (e) => {
   $('#wlink').closest('.field').classList.toggle('invalid', !okLink);
   if(!okLink) return;
   if(isWeb && !pendingBlob && !currentSrc && !pendingBlobs.length && link) currentSrc = shotUrl(link); // capture auto si pas d'image
-  const okTitle = title.length >= 2, okImg = !!(pendingBlob || currentSrc || pendingBlobs.length);
+  const okTitle = title.length >= 2, okImg = !!(pendingBlob || currentSrc || pendingBlobs.length || (isCharte() && pagesState.length));
   $('#wtitle').closest('.field').classList.toggle('invalid', !okTitle);
   $('#drop').classList.toggle('invalid', !okImg);
   if(!okImg) toast('Ajoute une image.', true);
   if(!okTitle || !okImg) return;
   const btn = $('#wsave');
   btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
+  if(isCharte()){
+    if(!pagesState.length){ $('#drop').classList.add('invalid'); toast('Ajoute au moins une page.', true); return; }
+    if(title.length < 2){ $('#wtitle').closest('.field').classList.add('invalid'); return; }
+    const btn = $('#wsave'); btn.disabled = true;
+    try {
+      const n = pagesState.length; let k = 0;
+      for(const p of pagesState){
+        k++;
+        if(p.blob){
+          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Envoi page ${k}/${n}…`;
+          const up = await api('/api/admin/media', {method:'POST', body: p.blob, headers: {'Content-Type': p.blob.type || 'image/jpeg'}});
+          p.src = up.url; delete p.blob;
+        }
+      }
+      const pages = pagesState.map(p => p.src);
+      const payload = {
+        title, cat: 'charte', catLabel: $('#wlabel').value.trim(), description: $('#wdesc').value.trim(),
+        src: pages[0], pages, published: $('#wpub').checked, featured: $('#wfeat').checked, link: null, tags: null,
+      };
+      if(editing){
+        const { work } = await api(`/api/admin/works/${editing.id}`, {method:'PUT', body: JSON.stringify(payload)});
+        Object.assign(editing, work); toast('Charte mise à jour');
+      } else {
+        const { work } = await api('/api/admin/works', {method:'POST', body: JSON.stringify(payload)});
+        state.works.unshift(work); toast(`Charte ajoutée (${n} page${n > 1 ? 's' : ''}) — un seul projet`);
+      }
+      dlg.close();
+      if(location.hash.startsWith('#creas')) renderWorks(); else location.hash = '#creas';
+    } catch (err) { toast(err.message, true); }
+    finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-check"></i> Enregistrer'; }
+    return;
+  }
   if(!editing && pendingBlobs.length){
     const n = pendingBlobs.length, created = [];
     try {

@@ -105,6 +105,7 @@ function card(w, i){
   item.innerHTML = `
     <div class="thumb" style="--img:url('${NK.esc(w.src)}')"><img src="${NK.esc(w.src)}" alt="${NK.esc(w.title)}" loading="lazy"></div>
     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
+    ${w.pages && w.pages.length > 1 ? `<span class="g-pages"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> ${w.pages.length} pages</span>` : ''}
     <div class="g-caption"><span class="cat">${NK.esc(w.catLabel)}</span><h4>${NK.esc(w.title)}</h4></div>`;
   if(['logo','carte'].includes(w.cat)) NK.applyPadded(item.querySelector('.thumb img'), item, { ratio: 4/5, pad: w.cat === 'carte' ? 0.09 : 0.12, card: w.cat === 'carte' });
   item.addEventListener('click', () => openLightbox(w));
@@ -195,9 +196,39 @@ const lbTitle = document.getElementById('lightboxTitle');
 const lbCat = document.getElementById('lightboxCat');
 const lbDesc = document.getElementById('lightboxDesc');
 let lastFocus = null;
+let lbWork = null, lbIndex = 0;
+const lbPrev = document.getElementById('lbPrev'), lbNext = document.getElementById('lbNext'), lbCount = document.getElementById('lbCount');
+function showPage(i){
+  const pages = lbWork.pages || [lbWork.src];
+  lbIndex = (i + pages.length) % pages.length;
+  lbImg.src = pages[lbIndex];
+  lbImg.alt = `${lbWork.title} — page ${lbIndex + 1} sur ${pages.length}`;
+  lbCount.textContent = `${lbIndex + 1} / ${pages.length}`;
+  // précharge la page suivante
+  if(pages.length > 1){ const pre = new Image(); pre.src = pages[(lbIndex + 1) % pages.length]; }
+}
+lbPrev.addEventListener('click', (e) => { e.stopPropagation(); showPage(lbIndex - 1); });
+lbNext.addEventListener('click', (e) => { e.stopPropagation(); showPage(lbIndex + 1); });
+document.addEventListener('keydown', (e) => {
+  if(!lightbox.classList.contains('open') || !lbWork || (lbWork.pages || []).length < 2) return;
+  if(e.key === 'ArrowRight') showPage(lbIndex + 1);
+  if(e.key === 'ArrowLeft') showPage(lbIndex - 1);
+});
+let touchX = null;
+lightbox.addEventListener('touchstart', (e) => { touchX = e.touches[0].clientX; }, { passive: true });
+lightbox.addEventListener('touchend', (e) => {
+  if(touchX === null || !lbWork || (lbWork.pages || []).length < 2) return;
+  const dx = e.changedTouches[0].clientX - touchX; touchX = null;
+  if(Math.abs(dx) > 45) showPage(lbIndex + (dx < 0 ? 1 : -1));
+}, { passive: true });
 function openLightbox(w){
   lastFocus = document.activeElement;
+  lbWork = w;
+  const multi = (w.pages || []).length > 1;
+  lbPrev.hidden = lbNext.hidden = lbCount.hidden = !multi;
+  lightbox.classList.toggle('is-multi', multi);
   lbImg.src = w.src; lbImg.alt = w.title; lbImg.hidden = false;
+  if(multi) showPage(0);
   lightbox.classList.toggle('is-logo', ['logo','carte'].includes(w.cat));
   lightbox.classList.toggle('is-carte', w.cat === 'carte');
   lightbox.classList.remove('is-padded');

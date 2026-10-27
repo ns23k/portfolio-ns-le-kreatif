@@ -242,6 +242,7 @@ function renderWorks(){
       <div class="wbody"><span class="cat">${esc(w.catLabel)}</span><h3>${esc(w.title)}</h3></div>
       <div class="wacts">
         <button class="btn btn-ghost btn-sm grow" data-edit title="Modifier"><i class="fa-solid fa-pen"></i><span class="lbl-edit">Modifier</span></button>
+        ${w.pages && w.pages.length > 1 ? `<button class="icon-btn" data-order title="Changer l'ordre des ${w.cat === 'charte' ? 'pages' : w.cat === 'affiche' ? 'affiches' : 'visuels'}" aria-label="Changer l'ordre"><i class="fa-solid fa-arrow-down-1-9"></i></button>` : ''}
         <button class="icon-btn ${w.featured ? 'on' : ''}" data-star title="${w.featured ? 'Retirer du slider' : 'Mettre dans le slider'}" aria-label="Slider d'accueil"><i class="fa-${w.featured ? 'solid' : 'regular'} fa-star"></i></button>
         <button class="icon-btn" data-vis title="${w.published ? 'Masquer du site' : 'Publier'}" aria-label="Visibilité"><i class="fa-solid ${w.published ? 'fa-eye' : 'fa-eye-slash'}"></i></button>
         <button class="icon-btn danger" data-del title="Supprimer" aria-label="Supprimer"><i class="fa-solid fa-trash"></i></button>
@@ -252,6 +253,13 @@ function renderWorks(){
     const id = Number(card.dataset.id);
     const w = state.works.find(x => x.id === id);
     $$('[data-edit]', card).forEach(el => el.addEventListener('click', (e) => { if(!e.target.closest('.handle, .move-btns')) openWork(w); }));
+    $('[data-order]', card)?.addEventListener('click', (e) => {
+      e.stopPropagation(); openWork(w);
+      setTimeout(() => {
+        const box = $('#pagesBox'); box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        box.classList.add('focus-pulse'); setTimeout(() => box.classList.remove('focus-pulse'), 1600);
+      }, 120);
+    });
     $('[data-star]', card).addEventListener('click', () => patchWork(w, {featured: !w.featured}, w.featured ? 'Retirée du slider' : 'Ajoutée au slider d\'accueil'));
     $('[data-vis]', card).addEventListener('click', () => patchWork(w, {published: !w.published}, w.published ? 'Créa masquée du site' : 'Créa publiée'));
     $('[data-del]', card).addEventListener('click', async (e) => {

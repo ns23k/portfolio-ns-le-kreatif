@@ -448,3 +448,14 @@ dialog::backdrop{background:rgba(5,9,22,.6); backdrop-filter:blur(3px);}
 .wcard.drop-target{outline:3px dashed var(--accent); outline-offset:2px;}
 .wcard.drop-target .wthumb::after{content:"Déposer pour ajouter au projet"; position:absolute; inset:0; z-index:5; display:flex; align-items:center; justify-content:center; text-align:center; padding:12px; background:rgba(242,183,5,.85); color:#141414; font-weight:700; font-size:14px;}
 .wcard.uploading{opacity:.6; pointer-events:none;}
+
+.pages-box.focus-pulse{animation:pagesPulse 1.6s ease;}
+@keyframes pagesPulse{0%,100%{box-shadow:0 0 0 0 rgba(242,183,5,0);} 30%{box-shadow:0 0 0 5px rgba(242,183,5,.55);}}
+/* vignettes des visuels : hauteur fixe (évite le chevauchement), 2 colonnes sur mobile */
+.pages-list{grid-auto-rows:150px; max-height:340px;}
+.pages-list li{aspect-ratio:auto; height:150px;}
+@media (max-width:560px){
+  .pages-list{grid-template-columns:repeat(2, minmax(0,1fr)); grid-auto-rows:170px; max-height:none;}
+  .pages-list li{height:170px;}
+  .pg-acts button, .pg-rep{width:32px; height:32px; font-size:12px;}
+}

@@ -274,6 +274,7 @@ function renderWorks(){
     }
   });
   updateMergeBar();
+  enableCardDrop();
   $$('#wgrid .wcard.is-logo').forEach(card => {
     const im = card.querySelector('.wthumb img'); if(!im || im.dataset.padded) return;
     im.dataset.padded = '1'; const isCarte = card.classList.contains('is-carte');
@@ -283,6 +284,41 @@ function renderWorks(){
   if(reorder) enableDrag();
 }
 
+
+/* ----- glisser des images sur une carte : ajout direct de visuels au projet ----- */
+function enableCardDrop(){
+  $$('#wgrid .wcard').forEach(card => {
+    const w = state.works.find(x => x.id === Number(card.dataset.id));
+    if(!w || w.cat === 'web') return;
+    const files = (e) => [...(e.dataTransfer?.types || [])].includes('Files');
+    card.addEventListener('dragover', (e) => { if(!files(e)) return; e.preventDefault(); card.classList.add('drop-target'); });
+    card.addEventListener('dragleave', (e) => { if(!card.contains(e.relatedTarget)) card.classList.remove('drop-target'); });
+    card.addEventListener('drop', async (e) => {
+      if(!files(e)) return;
+      e.preventDefault(); card.classList.remove('drop-target');
+      const list = [...e.dataTransfer.files].filter(f => /^image\/(jpeg|png|webp|gif)$/.test(f.type))
+        .sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
+      if(!list.length){ toast('Dépose des images (JPG, PNG, WEBP).', true); return; }
+      const current = (w.pages && w.pages.length ? w.pages : [w.src]);
+      if(current.length + list.length > 60){ toast('60 visuels maximum par projet.', true); return; }
+      card.classList.add('uploading');
+      try {
+        const added = [];
+        for(let i = 0; i < list.length; i++){
+          toast(`Ajout de ${list.length} visuel${list.length > 1 ? 's' : ''} à « ${w.title} »… (${i + 1}/${list.length})`);
+          const blob = await optimise(list[i]);
+          const up = await api('/api/admin/media', {method:'POST', body: blob, headers: {'Content-Type': blob.type || 'image/jpeg'}});
+          added.push(up.url);
+        }
+        const pages = current.concat(added);
+        const { work } = await api(`/api/admin/works/${w.id}`, {method:'PUT', body: JSON.stringify({ pages, src: pages[0] })});
+        Object.assign(w, work); renderWorks();
+        toast(`« ${w.title} » : ${pages.length} visuels`);
+      } catch (err) { toast(err.message, true); }
+      finally { card.classList.remove('uploading'); }
+    });
+  });
+}
 
 /* ----- regrouper des créas existantes en un seul projet ----- */
 state.selecting = false; state.sel = new Set();
@@ -500,26 +536,77 @@ function renderPages(){
   $('#pagesAddLbl').textContent = isCharte() ? 'Ajouter des pages' : 'Ajouter des visuels';
   $('#pagesSplit').hidden = !(editing && (editing.pages || []).length > 1);
   $('#pagesList').innerHTML = pagesState.map((p, i) => `
-    <li>
-      <img src="${esc(p.url || p.src)}" alt="Page ${i + 1}">
-      <span class="pg-num">${i === 0 ? '1 · Couv.' : i + 1}</span>
+    <li draggable="true" data-i="${i}" title="Glisse pour déplacer · dépose une image ici pour la remplacer">
+      <img src="${esc(p.url || p.src)}" alt="${u} ${i + 1}" draggable="false">
+      <span class="pg-num">${i === 0 ? '1 ★' : i + 1}</span>
+      <button type="button" class="pg-rep" data-pg-rep="${i}" aria-label="Remplacer ${u} ${i + 1}" title="Remplacer"><i class="fa-solid fa-pen"></i></button>
       <span class="pg-acts">
         <button type="button" data-pg-left="${i}" aria-label="Avancer la page ${i + 1}" ${i === 0 ? 'disabled' : ''}><i class="fa-solid fa-arrow-left"></i></button>
         <button type="button" data-pg-right="${i}" aria-label="Reculer la page ${i + 1}" ${i === n - 1 ? 'disabled' : ''}><i class="fa-solid fa-arrow-right"></i></button>
         <button type="button" data-pg-del="${i}" aria-label="Retirer la page ${i + 1}"><i class="fa-solid fa-xmark"></i></button>
       </span>
-    </li>`).join('');
+    </li>`).join('') + `<li class="pg-add" data-pg-addtile><i class="fa-solid fa-plus"></i><span>Glisse ou clique pour ajouter</span></li>`;
   setPreview(n ? (pagesState[0].url || pagesState[0].src) : '');
   if(n > 1) $('#drop .change').innerHTML = `<i class="fa-solid fa-images"></i> Ajouter des ${unitWord()}s`;
 }
 $('#pagesList').addEventListener('click', (e) => {
+  if(e.target.closest('[data-pg-addtile]')){ $('#pagesFile').click(); return; }
   const b = e.target.closest('button'); if(!b) return;
+  if(b.dataset.pgRep){ replaceIndex = +b.dataset.pgRep; $('#pageReplaceFile').click(); return; }
   const swap = (a, c) => { [pagesState[a], pagesState[c]] = [pagesState[c], pagesState[a]]; };
   if(b.dataset.pgLeft) swap(+b.dataset.pgLeft, +b.dataset.pgLeft - 1);
   else if(b.dataset.pgRight) swap(+b.dataset.pgRight, +b.dataset.pgRight + 1);
   else if(b.dataset.pgDel) pagesState.splice(+b.dataset.pgDel, 1);
   renderPages();
 });
+/* ----- glisser-déposer : réordonner, remplacer, ajouter ----- */
+let replaceIndex = -1, dragPage = -1;
+const hasFiles = (e) => [...(e.dataTransfer?.types || [])].includes('Files');
+async function replacePage(i, file){
+  if(!file || !/^image\/(jpeg|png|webp|gif)$/.test(file.type)){ toast('Format non accepté (JPG, PNG, WEBP ou GIF).', true); return; }
+  try {
+    $('#uplInfo').textContent = 'Optimisation…';
+    const blob = await optimise(file);
+    pagesState[i] = { blob, url: URL.createObjectURL(blob) };
+    $('#uplInfo').textContent = `${unitWord()} ${i + 1} remplacé${isCharte() ? 'e' : ''} — pense à enregistrer.`;
+    renderPages();
+  } catch (err) { toast(err.message, true); }
+}
+$('#pageReplaceFile').addEventListener('change', (e) => { if(replaceIndex > -1) replacePage(replaceIndex, e.target.files[0]); replaceIndex = -1; e.target.value = ''; });
+const pl = $('#pagesList'), pbox = $('#pagesBox');
+pl.addEventListener('dragstart', (e) => {
+  const li = e.target.closest('li[data-i]'); if(!li) return;
+  dragPage = +li.dataset.i; li.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', 'page');
+});
+pl.addEventListener('dragend', () => { dragPage = -1; $$('#pagesList li').forEach(l => l.classList.remove('dragging', 'over', 'over-rep')); });
+pl.addEventListener('dragover', (e) => {
+  const li = e.target.closest('li[data-i]');
+  if(dragPage < 0 && !hasFiles(e)) return;
+  e.preventDefault();
+  $$('#pagesList li').forEach(l => l.classList.remove('over', 'over-rep'));
+  if(li) li.classList.add(hasFiles(e) ? 'over-rep' : 'over');
+});
+pl.addEventListener('drop', (e) => {
+  e.preventDefault(); e.stopPropagation();
+  const li = e.target.closest('li[data-i]');
+  $$('#pagesList li').forEach(l => l.classList.remove('over', 'over-rep'));
+  pbox.classList.remove('over');
+  if(hasFiles(e)){
+    const files = e.dataTransfer.files;
+    if(li && files.length === 1) replacePage(+li.dataset.i, files[0]);   // 1 image sur une vignette = remplacer
+    else addPages(files);                                                // sinon = ajouter à la suite
+    return;
+  }
+  if(dragPage < 0) return;
+  const to = li ? +li.dataset.i : pagesState.length - 1;
+  if(to !== dragPage){ const [m] = pagesState.splice(dragPage, 1); pagesState.splice(to, 0, m); }
+  dragPage = -1; renderPages();
+});
+pbox.addEventListener('dragover', (e) => { if(hasFiles(e)){ e.preventDefault(); pbox.classList.add('over'); } });
+pbox.addEventListener('dragleave', (e) => { if(!pbox.contains(e.relatedTarget)) pbox.classList.remove('over'); });
+pbox.addEventListener('drop', (e) => { if(!hasFiles(e)) return; e.preventDefault(); pbox.classList.remove('over'); addPages(e.dataTransfer.files); });
+
 async function addPages(list){
   const files = [...(list || [])].filter(f => /^image\/(jpeg|png|webp|gif)$/.test(f.type))
     .sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));

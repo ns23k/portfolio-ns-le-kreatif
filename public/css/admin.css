@@ -433,3 +433,18 @@ dialog::backdrop{background:rgba(5,9,22,.6); backdrop-filter:blur(3px);}
 .merge-bar #mergeCount{font-weight:600; font-size:14px; flex:0 0 auto;}
 .merge-bar .input{flex:1 1 240px; min-width:0;}
 @media (max-width:640px){ .merge-bar{bottom:72px;} .merge-bar .btn{flex:1 1 auto; justify-content:center;} }
+
+/* glisser-déposer des visuels */
+.pages-box.over{border-color:var(--accent); border-style:dashed; background:color-mix(in srgb, var(--accent) 10%, var(--surface-2));}
+.pages-list li[data-i]{cursor:grab;}
+.pages-list li.dragging{opacity:.4;}
+.pages-list li.over{outline:3px solid var(--accent); outline-offset:-3px;}
+.pages-list li.over-rep{outline:3px dashed var(--accent); outline-offset:-3px;}
+.pages-list li.over-rep::after{content:"Remplacer"; position:absolute; inset:0; display:flex; align-items:center; justify-content:center; background:rgba(242,183,5,.75); color:#141414; font-weight:700; font-size:12px;}
+.pg-rep{position:absolute; top:5px; right:5px; width:26px; height:26px; border-radius:50%; border:none; background:rgba(255,255,255,.95); color:#10142B; font-size:11px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.25);}
+.pages-list .pg-add{display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; text-align:center; font-size:11.5px; color:var(--muted); background:transparent; border:2px dashed var(--border); cursor:pointer; padding:6px;}
+.pages-list .pg-add i{font-size:18px; color:var(--brand);}
+.pages-list .pg-add:hover{border-color:var(--accent);}
+.wcard.drop-target{outline:3px dashed var(--accent); outline-offset:2px;}
+.wcard.drop-target .wthumb::after{content:"Déposer pour ajouter au projet"; position:absolute; inset:0; z-index:5; display:flex; align-items:center; justify-content:center; text-align:center; padding:12px; background:rgba(242,183,5,.85); color:#141414; font-weight:700; font-size:14px;}
+.wcard.uploading{opacity:.6; pointer-events:none;}

@@ -290,8 +290,12 @@ admin.post('/account', wrap(async (req, res) => {
 
 /* ---------- tableau de bord ---------- */
 admin.get('/stats', wrap(async (req, res) => {
-  const [w] = await query('SELECT COUNT(*) AS total, SUM(published) AS published, SUM(featured) AS featured FROM works');
-  const byCat = await query('SELECT cat, COUNT(*) AS n FROM works GROUP BY cat');
+  // une charte = 1 projet ; dans une série d'affiches (ou autre groupe), chaque visuel compte comme un projet
+  const all = await query('SELECT cat, published, featured, image_url, pages FROM works');
+  const pc = (r) => (r.cat === 'charte' ? 1 : pagesOf(r).length);
+  const w = { total: 0, published: 0, featured: 0 }; const catMap = {};
+  for (const r of all) { const n = pc(r); w.total += n; if (r.published) w.published += n; if (r.featured) w.featured++; catMap[r.cat] = (catMap[r.cat] || 0) + n; }
+  const byCat = Object.entries(catMap).map(([cat, n]) => ({ cat, n }));
   const byStatus = await query('SELECT status, COUNT(*) AS n FROM quotes GROUP BY status');
   const [u] = await query('SELECT COUNT(*) AS n FROM quotes WHERE unread_admin = 1');
   const [acc] = await query("SELECT COALESCE(SUM(price),0) AS total FROM quotes WHERE status IN ('accepte','termine')");

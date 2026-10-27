@@ -32,7 +32,8 @@ async function loadWorks(){
   renderGallery('all');
   renderSport();
   renderWeb();
-  startCounter(list.length);
+  // une charte = 1 projet ; dans une série d'affiches, chaque affiche compte comme un projet
+  startCounter(list.reduce((n, w) => n + (w.cat === 'charte' ? 1 : Math.max(1, (w.pages || []).length)), 0));
 }
 
 /* ============================================
@@ -105,7 +106,7 @@ function card(w, i){
   item.innerHTML = `
     <div class="thumb" style="--img:url('${NK.esc(w.src)}')"><img src="${NK.esc(w.src)}" alt="${NK.esc(w.title)}" loading="lazy"></div>
     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-    ${w.pages && w.pages.length > 1 ? `<span class="g-pages"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> ${w.pages.length} ${w.cat === 'charte' ? 'pages' : 'visuels'}</span>` : ''}
+    ${w.pages && w.pages.length > 1 ? `<span class="g-pages"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> ${w.pages.length} ${w.cat === 'charte' ? 'pages' : w.cat === 'affiche' ? 'affiches' : 'visuels'}</span>` : ''}
     <div class="g-caption"><span class="cat">${NK.esc(w.catLabel)}</span><h4>${NK.esc(w.title)}</h4></div>`;
   if(['logo','carte'].includes(w.cat)) NK.applyPadded(item.querySelector('.thumb img'), item, { ratio: 4/5, pad: w.cat === 'carte' ? 0.09 : 0.12, card: w.cat === 'carte' });
   item.addEventListener('click', () => openLightbox(w));

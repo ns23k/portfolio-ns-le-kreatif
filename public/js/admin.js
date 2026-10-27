@@ -204,11 +204,13 @@ function filteredWorks(){
 }
 const canReorder = () => state.wcat === 'all' && !state.wsearch && !state.wvis;
 
+const projectCount = (w) => w.cat === 'charte' ? 1 : Math.max(1, (w.pages || []).length);
+const sumProjects = (list) => list.reduce((n, w) => n + projectCount(w), 0);
 function renderWorks(){
-  const total = state.works.length, pub = state.works.filter(w => w.published).length, star = state.works.filter(w => w.featured).length;
+  const total = sumProjects(state.works), pub = sumProjects(state.works.filter(w => w.published)), star = state.works.filter(w => w.featured).length;
   $('#worksSummary').textContent = `${total} créations · ${pub} publiées · ${star} dans le slider d'accueil`;
   const counts = {};
-  state.works.forEach(w => counts[w.cat] = (counts[w.cat] || 0) + 1);
+  state.works.forEach(w => counts[w.cat] = (counts[w.cat] || 0) + projectCount(w));
   $('#catChips').innerHTML = `<button class="chip ${state.wcat === 'all' ? 'active' : ''}" data-cat="all">Toutes <em>${total}</em></button>` +
     Object.keys(state.categories).map(k => `<button class="chip ${state.wcat === k ? 'active' : ''}" data-cat="${k}">${esc(catName(k))} <em>${counts[k] || 0}</em></button>`).join('');
   $$('#catChips .chip').forEach(c => c.addEventListener('click', () => { state.wcat = c.dataset.cat; renderWorks(); }));
@@ -232,7 +234,7 @@ function renderWorks(){
         <div class="wbadges">
           ${w.featured ? '<span class="wbadge star"><i class="fa-solid fa-star"></i> Accueil</span>' : ''}
           ${w.published ? '' : '<span class="wbadge"><i class="fa-solid fa-eye-slash"></i> Masquée</span>'}
-          ${w.pages && w.pages.length > 1 ? `<span class="wbadge"><i class="fa-solid fa-layer-group"></i> ${w.pages.length} ${w.cat === 'charte' ? 'pages' : 'visuels'}</span>` : ''}
+          ${w.pages && w.pages.length > 1 ? `<span class="wbadge"><i class="fa-solid fa-layer-group"></i> ${w.pages.length} ${w.cat === 'charte' ? 'pages' : w.cat === 'affiche' ? 'affiches' : 'visuels'}</span>` : ''}
         </div>
         ${reorder ? `<span class="handle" draggable="true" title="Glisser pour déplacer" aria-hidden="true"><i class="fa-solid fa-grip-vertical"></i></span>
           <div class="move-btns"><button class="icon-btn" data-move="-1" aria-label="Avancer"><i class="fa-solid fa-arrow-left"></i></button><button class="icon-btn" data-move="1" aria-label="Reculer"><i class="fa-solid fa-arrow-right"></i></button></div>` : ''}

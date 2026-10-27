@@ -105,7 +105,7 @@ function card(w, i){
   item.innerHTML = `
     <div class="thumb" style="--img:url('${NK.esc(w.src)}')"><img src="${NK.esc(w.src)}" alt="${NK.esc(w.title)}" loading="lazy"></div>
     <div class="g-zoom"><i class="fa-solid fa-expand"></i></div>
-    ${w.pages && w.pages.length > 1 ? `<span class="g-pages"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> ${w.pages.length} pages</span>` : ''}
+    ${w.pages && w.pages.length > 1 ? `<span class="g-pages"><i class="fa-solid fa-layer-group" aria-hidden="true"></i> ${w.pages.length} ${w.cat === 'charte' ? 'pages' : 'visuels'}</span>` : ''}
     <div class="g-caption"><span class="cat">${NK.esc(w.catLabel)}</span><h4>${NK.esc(w.title)}</h4></div>`;
   if(['logo','carte'].includes(w.cat)) NK.applyPadded(item.querySelector('.thumb img'), item, { ratio: 4/5, pad: w.cat === 'carte' ? 0.09 : 0.12, card: w.cat === 'carte' });
   item.addEventListener('click', () => openLightbox(w));
@@ -202,7 +202,7 @@ function showPage(i){
   const pages = lbWork.pages || [lbWork.src];
   lbIndex = (i + pages.length) % pages.length;
   lbImg.src = pages[lbIndex];
-  lbImg.alt = `${lbWork.title} — page ${lbIndex + 1} sur ${pages.length}`;
+  lbImg.alt = `${lbWork.title} — ${lbWork.cat === 'charte' ? 'page' : 'visuel'} ${lbIndex + 1} sur ${pages.length}`;
   lbCount.textContent = `${lbIndex + 1} / ${pages.length}`;
   // précharge la page suivante
   if(pages.length > 1){ const pre = new Image(); pre.src = pages[(lbIndex + 1) % pages.length]; }

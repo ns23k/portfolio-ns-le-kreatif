@@ -214,7 +214,8 @@ function renderWorks(){
   $$('#catChips .chip').forEach(c => c.addEventListener('click', () => { state.wcat = c.dataset.cat; renderWorks(); }));
 
   const list = filteredWorks();
-  const reorder = canReorder();
+  const reorder = canReorder() && !state.selecting;
+  $('#wgrid').classList.toggle('selecting', !!state.selecting);
   $('#dragHint').innerHTML = reorder
     ? '<i class="fa-solid fa-grip-vertical"></i> Glisse les cartes avec la poignée (ou les flèches sur mobile) pour changer l\'ordre sur le site.'
     : '<i class="fa-solid fa-circle-info"></i> Pour réordonner, affiche « Toutes » sans recherche ni filtre.';
@@ -227,10 +228,11 @@ function renderWorks(){
     <article class="wcard ${w.published ? '' : 'hidden-work'} ${['logo','carte'].includes(w.cat) ? 'is-logo' : ''} ${w.cat === 'carte' ? 'is-carte' : ''} ${w.cat === 'web' ? 'is-web' : ''} ${w.cat === 'mockup' ? 'is-mockup' : ''}" data-id="${w.id}">
       <div class="wthumb" data-edit style="--img:url('${esc(w.src)}')">
         <img src="${esc(w.src)}" alt="" loading="lazy">
+        ${state.selecting && w.cat !== 'web' ? `<span class="sel-check ${state.sel.has(w.id) ? 'on' : ''}" aria-hidden="true"><i class="fa-solid fa-check"></i></span>` : ''}
         <div class="wbadges">
           ${w.featured ? '<span class="wbadge star"><i class="fa-solid fa-star"></i> Accueil</span>' : ''}
           ${w.published ? '' : '<span class="wbadge"><i class="fa-solid fa-eye-slash"></i> Masquée</span>'}
-          ${w.pages && w.pages.length > 1 ? `<span class="wbadge"><i class="fa-solid fa-layer-group"></i> ${w.pages.length} pages</span>` : ''}
+          ${w.pages && w.pages.length > 1 ? `<span class="wbadge"><i class="fa-solid fa-layer-group"></i> ${w.pages.length} ${w.cat === 'charte' ? 'pages' : 'visuels'}</span>` : ''}
         </div>
         ${reorder ? `<span class="handle" draggable="true" title="Glisser pour déplacer" aria-hidden="true"><i class="fa-solid fa-grip-vertical"></i></span>
           <div class="move-btns"><button class="icon-btn" data-move="-1" aria-label="Avancer"><i class="fa-solid fa-arrow-left"></i></button><button class="icon-btn" data-move="1" aria-label="Reculer"><i class="fa-solid fa-arrow-right"></i></button></div>` : ''}
@@ -259,7 +261,19 @@ function renderWorks(){
       } catch (err) { toast(err.message, true); }
     });
     $$('[data-move]', card).forEach(b => b.addEventListener('click', (e) => { e.stopPropagation(); moveWork(id, Number(b.dataset.move)); }));
+    if(state.selecting){
+      card.classList.toggle('is-selected', state.sel.has(id));
+      card.addEventListener('click', (e) => {
+        e.preventDefault(); e.stopPropagation();
+        if(w.cat === 'web'){ toast('Les réalisations web ne se regroupent pas.', true); return; }
+        state.sel.has(id) ? state.sel.delete(id) : state.sel.add(id);
+        card.classList.toggle('is-selected', state.sel.has(id));
+        card.querySelector('.sel-check')?.classList.toggle('on', state.sel.has(id));
+        updateMergeBar();
+      }, true);
+    }
   });
+  updateMergeBar();
   $$('#wgrid .wcard.is-logo').forEach(card => {
     const im = card.querySelector('.wthumb img'); if(!im || im.dataset.padded) return;
     im.dataset.padded = '1'; const isCarte = card.classList.contains('is-carte');
@@ -269,6 +283,39 @@ function renderWorks(){
   if(reorder) enableDrag();
 }
 
+
+/* ----- regrouper des créas existantes en un seul projet ----- */
+state.selecting = false; state.sel = new Set();
+function selectedInOrder(){ return state.works.filter(w => state.sel.has(w.id)); }
+function updateMergeBar(){
+  const bar = $('#mergeBar'); bar.hidden = !state.selecting;
+  $('#groupMode').classList.toggle('active', !!state.selecting);
+  $('#groupMode').innerHTML = state.selecting ? '<i class="fa-solid fa-xmark"></i> Terminer' : '<i class="fa-solid fa-object-group"></i> Regrouper';
+  if(!state.selecting) return;
+  const sel = selectedInOrder(), n = sel.length;
+  $('#mergeCount').textContent = n ? `${n} créa${n > 1 ? 's' : ''} sélectionnée${n > 1 ? 's' : ''}` : 'Touche les créas d\'un même projet';
+  const t = $('#mergeTitle');
+  if(n && !t.dataset.touched) t.value = sel[0].title.replace(/\s+[—–]\s+[^—–]+$/, '');
+  if(!n && !t.dataset.touched) t.value = '';
+  $('#mergeGo').disabled = n < 2 || t.value.trim().length < 2;
+}
+$('#groupMode').addEventListener('click', () => {
+  state.selecting = !state.selecting; state.sel.clear(); delete $('#mergeTitle').dataset.touched;
+  renderWorks();
+  if(state.selecting) toast('Touche les créas à regrouper, puis donne un nom au projet');
+});
+$('#mergeCancel').addEventListener('click', () => { state.selecting = false; state.sel.clear(); renderWorks(); });
+$('#mergeTitle').addEventListener('input', (e) => { e.target.dataset.touched = '1'; updateMergeBar(); });
+$('#mergeGo').addEventListener('click', async () => {
+  const ids = selectedInOrder().map(w => w.id), title = $('#mergeTitle').value.trim();
+  const btn = $('#mergeGo'); btn.disabled = true;
+  try {
+    const { work } = await api('/api/admin/works/merge', {method:'POST', body: JSON.stringify({ ids, title })});
+    state.selecting = false; state.sel.clear(); delete $('#mergeTitle').dataset.touched;
+    await loadWorks();
+    toast(`« ${work.title} » : ${work.pages.length} visuels regroupés en une seule créa`);
+  } catch (err) { toast(err.message, true); btn.disabled = false; }
+});
 
 /* Logos & cartes : marge blanche dessinée DANS l'image (résiste au « mode sombre forcé » des navigateurs mobiles) */
 const _padCache = new Map();
@@ -403,8 +450,10 @@ function openWork(w = null){
   $('#uplInfo').textContent = "L'image est optimisée automatiquement avant l'envoi.";
   $('#wtitle').closest('.field').classList.remove('invalid');
   setPreview(currentSrc);
-  pagesState = w && w.cat === 'charte' ? (w.pages && w.pages.length ? w.pages : [w.src]).map(src => ({ src })) : [];
-  renderPages();
+  const grouped = w ? (w.cat === 'charte' || (w.pages || []).length > 1) : ['charte', 'affiche'].includes($('#wcat').value);
+  $('#wgroup').checked = grouped;
+  pagesState = w && grouped ? (w.pages && w.pages.length ? w.pages : [w.src]).map(src => ({ src })) : [];
+  syncGroupMode();
   dlg.showModal();
   setTimeout(() => (w ? $('#wtitle') : $('#drop')).focus(), 30);
 }
@@ -412,30 +461,44 @@ function openWork(w = null){
 $('#wcat').addEventListener('change', () => {
   if($('#wlabel').dataset.auto) $('#wlabel').value = state.categories[$('#wcat').value] || '';
   toggleWebFields();
-  if(isCharte() && !pagesState.length){
-    // images déjà choisies → elles deviennent les pages de la charte
-    if(pendingBlobs.length) pagesState = pendingBlobs.map(blob => ({ blob, url: URL.createObjectURL(blob) }));
-    else if(pendingBlob) pagesState = [{ blob: pendingBlob, url: URL.createObjectURL(pendingBlob) }];
-    else if(currentSrc) pagesState = [{ src: currentSrc }];
-    pendingBlobs = []; pendingBlob = null;
-  } else if(!isCharte() && pagesState.length){
-    const first = pagesState[0]; pagesState = [];
-    if(first.blob){ pendingBlob = first.blob; currentSrc = ''; } else currentSrc = first.src;
-    setPreview(first.url || first.src);
-  }
-  renderPages();
+  if(!editing) $('#wgroup').checked = ['charte', 'affiche'].includes($('#wcat').value);
+  syncGroupMode();
 });
 let pendingBlobs = [];
 
 /* ----- chartes graphiques : un projet = plusieurs pages ----- */
 let pagesState = [];           // [{ src } (déjà en ligne) | { blob, url } (à envoyer)]
 const isCharte = () => $('#wcat').value === 'charte';
+const isGrouped = () => $('#wcat').value !== 'web' && (isCharte() || $('#wgroup').checked);
+const unitWord = () => isCharte() ? 'page' : 'visuel';
+// bascule entre « une créa par image » et « série regroupée », sans perdre les images déjà choisies
+function syncGroupMode(){
+  const web = $('#wcat').value === 'web';
+  $('#wgroupRow').hidden = web || isCharte();
+  if(isCharte()) $('#wgroup').checked = true;
+  if(isGrouped() && !pagesState.length){
+    if(pendingBlobs.length) pagesState = pendingBlobs.map(blob => ({ blob, url: URL.createObjectURL(blob) }));
+    else if(pendingBlob) pagesState = [{ blob: pendingBlob, url: URL.createObjectURL(pendingBlob) }];
+    else if(currentSrc) pagesState = [{ src: currentSrc }];
+    pendingBlobs = []; pendingBlob = null;
+  } else if(!isGrouped() && pagesState.length){
+    const blobs = pagesState.filter(p => p.blob).map(p => p.blob);
+    const first = pagesState[0]; pagesState = [];
+    if(!editing && blobs.length > 1){ pendingBlobs = blobs; pendingBlob = null; currentSrc = ''; setPreview(blobs.map(b => URL.createObjectURL(b))); }
+    else { if(first.blob){ pendingBlob = first.blob; currentSrc = ''; } else currentSrc = first.src; setPreview(first.url || first.src); }
+  }
+  renderPages();
+}
+$('#wgroup').addEventListener('change', syncGroupMode);
 function renderPages(){
   const box = $('#pagesBox');
-  box.hidden = !isCharte();
+  box.hidden = !isGrouped();
   if(box.hidden) return;
   const n = pagesState.length;
-  $('#pagesCount').textContent = n ? `${n} page${n > 1 ? 's' : ''} dans cette charte` : 'Aucune page pour le moment';
+  const u = unitWord();
+  $('#pagesCount').textContent = n ? `${n} ${u}${n > 1 ? 's' : ''} dans ${isCharte() ? 'cette charte' : 'ce projet'}` : `Aucun${isCharte() ? 'e' : ''} ${u} pour le moment`;
+  $('#pagesAddLbl').textContent = isCharte() ? 'Ajouter des pages' : 'Ajouter des visuels';
+  $('#pagesSplit').hidden = !(editing && (editing.pages || []).length > 1);
   $('#pagesList').innerHTML = pagesState.map((p, i) => `
     <li>
       <img src="${esc(p.url || p.src)}" alt="Page ${i + 1}">
@@ -447,7 +510,7 @@ function renderPages(){
       </span>
     </li>`).join('');
   setPreview(n ? (pagesState[0].url || pagesState[0].src) : '');
-  if(n > 1) $('#drop .change').innerHTML = '<i class="fa-solid fa-images"></i> Ajouter des pages';
+  if(n > 1) $('#drop .change').innerHTML = `<i class="fa-solid fa-images"></i> Ajouter des ${unitWord()}s`;
 }
 $('#pagesList').addEventListener('click', (e) => {
   const b = e.target.closest('button'); if(!b) return;
@@ -461,19 +524,26 @@ async function addPages(list){
   const files = [...(list || [])].filter(f => /^image\/(jpeg|png|webp|gif)$/.test(f.type))
     .sort((a, b) => a.name.localeCompare(b.name, 'fr', { numeric: true }));
   if(!files.length) return;
-  if(pagesState.length + files.length > 60){ toast('60 pages maximum par charte.', true); return; }
+  if(pagesState.length + files.length > 60){ toast(`60 ${unitWord()}s maximum par projet.`, true); return; }
   try {
     for(let i = 0; i < files.length; i++){
       $('#uplInfo').textContent = `Optimisation ${i + 1}/${files.length}…`;
       const blob = await optimise(files[i]);
       pagesState.push({ blob, url: URL.createObjectURL(blob) });
     }
-    $('#uplInfo').textContent = `${pagesState.length} page(s) — tout sera enregistré comme un seul projet.`;
+    $('#uplInfo').textContent = `${pagesState.length} ${unitWord()}(s) — tout sera enregistré comme un seul projet.`;
     if(!$('#wtitle').value) $('#wtitle').value = files[0].name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').replace(/\s*\d+$/, '').trim();
   } catch (err) { toast(err.message, true); }
   renderPages();
 }
 $('#pagesAdd').addEventListener('click', () => $('#pagesFile').click());
+$('#pagesSplit').addEventListener('click', async (e) => {
+  if(!editing || !armed(e.currentTarget, 'Confirmer la séparation ?')) return;
+  try {
+    const { works } = await api(`/api/admin/works/${editing.id}/split`, {method:'POST', body: '{}'});
+    dlg.close(); await loadWorks(); toast(`${works.length} créas séparées`);
+  } catch (err) { toast(err.message, true); }
+});
 $('#pagesFile').addEventListener('change', (e) => { addPages(e.target.files); e.target.value = ''; });
 
 /* ----- réalisations web : lien, technologies, capture automatique ----- */
@@ -534,7 +604,7 @@ async function pickFile(file){
   } catch (err) { toast(err.message, true); $('#uplInfo').textContent = ''; }
 }
 async function pickFiles(list){
-  if(isCharte()) return addPages(list);
+  if(isGrouped()) return addPages(list);
   const files = [...(list || [])];
   if(files.length <= 1 || editing){ pendingBlobs = []; return pickFile(files[0]); }
   const ok = files.filter(f => /^image\/(jpeg|png|webp|gif)$/.test(f.type));
@@ -572,15 +642,15 @@ $('#workForm').addEventListener('submit', async (e) => {
   $('#wlink').closest('.field').classList.toggle('invalid', !okLink);
   if(!okLink) return;
   if(isWeb && !pendingBlob && !currentSrc && !pendingBlobs.length && link) currentSrc = shotUrl(link); // capture auto si pas d'image
-  const okTitle = title.length >= 2, okImg = !!(pendingBlob || currentSrc || pendingBlobs.length || (isCharte() && pagesState.length));
+  const okTitle = title.length >= 2, okImg = !!(pendingBlob || currentSrc || pendingBlobs.length || (isGrouped() && pagesState.length));
   $('#wtitle').closest('.field').classList.toggle('invalid', !okTitle);
   $('#drop').classList.toggle('invalid', !okImg);
   if(!okImg) toast('Ajoute une image.', true);
   if(!okTitle || !okImg) return;
   const btn = $('#wsave');
   btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enregistrement…';
-  if(isCharte()){
-    if(!pagesState.length){ $('#drop').classList.add('invalid'); toast('Ajoute au moins une page.', true); return; }
+  if(isGrouped()){
+    if(!pagesState.length){ $('#drop').classList.add('invalid'); toast(`Ajoute au moins un${isCharte() ? 'e' : ''} ${unitWord()}.`, true); return; }
     if(title.length < 2){ $('#wtitle').closest('.field').classList.add('invalid'); return; }
     const btn = $('#wsave'); btn.disabled = true;
     try {
@@ -588,22 +658,22 @@ $('#workForm').addEventListener('submit', async (e) => {
       for(const p of pagesState){
         k++;
         if(p.blob){
-          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Envoi page ${k}/${n}…`;
+          btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Envoi ${unitWord()} ${k}/${n}…`;
           const up = await api('/api/admin/media', {method:'POST', body: p.blob, headers: {'Content-Type': p.blob.type || 'image/jpeg'}});
           p.src = up.url; delete p.blob;
         }
       }
       const pages = pagesState.map(p => p.src);
       const payload = {
-        title, cat: 'charte', catLabel: $('#wlabel').value.trim(), description: $('#wdesc').value.trim(),
+        title, cat: $('#wcat').value, catLabel: $('#wlabel').value.trim(), description: $('#wdesc').value.trim(),
         src: pages[0], pages, published: $('#wpub').checked, featured: $('#wfeat').checked, link: null, tags: null,
       };
       if(editing){
         const { work } = await api(`/api/admin/works/${editing.id}`, {method:'PUT', body: JSON.stringify(payload)});
-        Object.assign(editing, work); toast('Charte mise à jour');
+        Object.assign(editing, work); toast('Projet mis à jour');
       } else {
         const { work } = await api('/api/admin/works', {method:'POST', body: JSON.stringify(payload)});
-        state.works.unshift(work); toast(`Charte ajoutée (${n} page${n > 1 ? 's' : ''}) — un seul projet`);
+        state.works.unshift(work); toast(`Projet ajouté (${n} ${unitWord()}${n > 1 ? 's' : ''}) — une seule créa`);
       }
       dlg.close();
       if(location.hash.startsWith('#creas')) renderWorks(); else location.hash = '#creas';

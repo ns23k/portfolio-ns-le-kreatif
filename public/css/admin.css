@@ -420,3 +420,16 @@ dialog::backdrop{background:rgba(5,9,22,.6); backdrop-filter:blur(3px);}
 .pg-acts button{width:28px; height:28px; border-radius:50%; border:none; background:rgba(255,255,255,.95); color:#10142B; font-size:11px; display:flex; align-items:center; justify-content:center; box-shadow:0 2px 6px rgba(0,0,0,.25);}
 .pg-acts button:disabled{opacity:.35;}
 .pg-acts button[data-pg-del]{background:#C62828; color:#fff;}
+
+/* regroupement de créas */
+.pages-btns{display:flex; gap:8px; flex-wrap:wrap;}
+.wgrid.selecting .wcard{cursor:pointer;}
+.wgrid.selecting .wcard .wacts{opacity:.35; pointer-events:none;}
+.wcard.is-selected{outline:3px solid var(--accent); outline-offset:2px;}
+.sel-check{position:absolute; top:10px; right:10px; z-index:4; width:30px; height:30px; border-radius:50%; border:2px solid #fff; background:rgba(8,15,35,.45); color:transparent; display:flex; align-items:center; justify-content:center; font-size:13px; box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.sel-check.on{background:var(--accent); color:#141414; border-color:var(--accent);}
+#groupMode.active{border-color:var(--accent); color:var(--text);}
+.merge-bar{position:sticky; bottom:12px; z-index:30; margin-top:16px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:12px; box-shadow:0 18px 40px -18px rgba(8,15,35,.45);}
+.merge-bar #mergeCount{font-weight:600; font-size:14px; flex:0 0 auto;}
+.merge-bar .input{flex:1 1 240px; min-width:0;}
+@media (max-width:640px){ .merge-bar{bottom:72px;} .merge-bar .btn{flex:1 1 auto; justify-content:center;} }

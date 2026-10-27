@@ -11,7 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Marcellus&family=Sora:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="stylesheet" href="css/admin.css?v=202610271000">
+<link rel="stylesheet" href="css/admin.css?v=202610271100">
 <script>try{var t=localStorage.getItem('nk-theme');if(t==='dark'||(!t&&matchMedia('(prefers-color-scheme: dark)').matches))document.documentElement.classList.add('dark')}catch(e){}</script>
 </head>
 <body>
@@ -90,6 +90,7 @@
       <div class="chips" id="catChips"></div>
       <div class="toolbar">
         <input class="input" id="wsearch" type="search" placeholder="Rechercher une création…">
+        <button class="btn btn-ghost" type="button" id="groupMode"><i class="fa-solid fa-object-group"></i> Regrouper</button>
         <select class="input" id="wvis">
           <option value="">Toutes</option>
           <option value="pub">Publiées</option>
@@ -99,6 +100,12 @@
       </div>
       <div class="hint-bar" id="dragHint"><i class="fa-solid fa-grip-vertical"></i> Glisse les cartes avec la poignée pour changer l'ordre d'affichage sur le site.</div>
       <div class="wgrid" id="wgrid"></div>
+      <div class="merge-bar" id="mergeBar" hidden>
+        <span id="mergeCount">Sélectionne les créas à regrouper</span>
+        <input class="input" id="mergeTitle" maxlength="200" placeholder="Nom du projet (ex. Lancement Zone E — Mir Aat)">
+        <button class="btn btn-gold btn-sm" type="button" id="mergeGo" disabled><i class="fa-solid fa-object-group"></i> Regrouper</button>
+        <button class="btn btn-ghost btn-sm" type="button" id="mergeCancel">Annuler</button>
+      </div>
     </section>
 
     <!-- devis -->
@@ -199,7 +206,10 @@
         <div class="pages-box" id="pagesBox" hidden>
           <div class="pages-head"><b id="pagesCount">Pages de la charte</b><small>La 1<sup>re</sup> page sert de couverture. Change l'ordre avec les flèches.</small></div>
           <ol class="pages-list" id="pagesList"></ol>
-          <button type="button" class="btn btn-ghost btn-sm" id="pagesAdd"><i class="fa-solid fa-plus"></i> Ajouter des pages</button>
+          <div class="pages-btns">
+            <button type="button" class="btn btn-ghost btn-sm" id="pagesAdd"><i class="fa-solid fa-plus"></i> <span id="pagesAddLbl">Ajouter des pages</span></button>
+            <button type="button" class="btn btn-ghost btn-sm" id="pagesSplit" hidden><i class="fa-solid fa-object-ungroup"></i> Séparer en créas</button>
+          </div>
           <input type="file" id="pagesFile" accept="image/jpeg,image/png,image/webp" multiple hidden>
         </div>
       </div>
@@ -237,6 +247,7 @@
           <button type="button" class="btn btn-ghost btn-sm" id="wshot" style="margin:-4px 0 16px;"><i class="fa-solid fa-camera"></i> Capturer le site automatiquement</button>
         </div>
         <div style="display:grid; gap:10px;">
+          <label class="toggle" id="wgroupRow"><input type="checkbox" id="wgroup"><span><b>Série d'un même projet</b><small>Plusieurs visuels (ex. affiches d'un même évènement) regroupés en une seule créa</small></span></label>
           <label class="toggle"><input type="checkbox" id="wpub" checked><span><b>Publiée</b><small>Visible sur le site</small></span></label>
           <label class="toggle"><input type="checkbox" id="wfeat"><span><b>Mettre en avant</b><small>Apparaît dans le slider de l'accueil</small></span></label>
         </div>
@@ -251,6 +262,6 @@
 
 <div class="toasts" id="toasts" aria-live="polite"></div>
 
-<script src="js/admin.js?v=202610271000"></script>
+<script src="js/admin.js?v=202610271100"></script>
 </body>
 </html>

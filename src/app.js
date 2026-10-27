@@ -392,6 +392,43 @@ admin.delete('/works/:id', wrap(async (req, res) => {
   res.json({ ok: true });
 }));
 
+admin.post('/works/merge', wrap(async (req, res) => {
+  const ids = Array.isArray(req.body?.ids) ? [...new Set(req.body.ids.map(Number).filter(Number.isInteger))] : [];
+  const title = str(req.body?.title, 200);
+  if (ids.length < 2) return res.status(422).json({ error: 'Sélectionne au moins 2 créas.' });
+  if (title.length < 2) return res.status(422).json({ error: 'Donne un nom au projet.' });
+  const rows = await query(`SELECT * FROM works WHERE id IN (${ids.map(() => '?').join(',')})`, ids);
+  if (rows.length !== ids.length) return res.status(404).json({ error: 'Créa introuvable.' });
+  if (rows.some((w) => w.cat === 'web')) return res.status(422).json({ error: 'Les réalisations web ne se regroupent pas.' });
+  const ordered = ids.map((id) => rows.find((w) => w.id === id));
+  const pages = ordered.flatMap(pagesOf).slice(0, 60);
+  const keep = ordered[0];
+  await query('UPDATE works SET title = ?, pages = ?, image_url = ?, media_id = ?, published = ?, featured = ?, position = ? WHERE id = ?',
+    [title, JSON.stringify(pages), pages[0], mediaIdOf(pages[0]),
+      ordered.some((w) => w.published) ? 1 : 0, ordered.some((w) => w.featured) ? 1 : 0,
+      Math.min(...ordered.map((w) => Number(w.position))), keep.id]);
+  const others = ordered.slice(1).map((w) => w.id);
+  await query(`DELETE FROM works WHERE id IN (${others.map(() => '?').join(',')})`, others);
+  const [w] = await query('SELECT * FROM works WHERE id = ?', [keep.id]);
+  res.json({ work: adminWork(w) });
+}));
+
+admin.post('/works/:id/split', wrap(async (req, res) => {
+  const id = Number(req.params.id);
+  const [w] = await query('SELECT * FROM works WHERE id = ?', [id]);
+  if (!w) return res.status(404).json({ error: 'Création introuvable.' });
+  const pages = pagesOf(w);
+  if (pages.length < 2) return res.status(422).json({ error: 'Ce projet ne contient qu\'une image.' });
+  const base = String(w.title).replace(/\s*[—–-]\s*\d+$/, '');
+  await query('UPDATE works SET title = ?, pages = NULL, image_url = ?, media_id = ? WHERE id = ?', [`${base} — 1`.slice(0, 200), pages[0], mediaIdOf(pages[0]), id]);
+  for (let i = 1; i < pages.length; i++) {
+    await query('INSERT INTO works (title, cat, cat_label, description, image_url, media_id, featured, published, position) VALUES (?,?,?,?,?,?,0,?,?)',
+      [`${base} — ${i + 1}`.slice(0, 200), w.cat, w.cat_label, w.description, pages[i], mediaIdOf(pages[i]), w.published, Number(w.position)]); // même position : départagées par id, donc dans l'ordre
+  }
+  const rows = await query('SELECT * FROM works WHERE id = ? OR (cat = ? AND title LIKE ?) ORDER BY position, id', [id, w.cat, `${base} — %`]);
+  res.json({ works: rows.map(adminWork) });
+}));
+
 admin.post('/works/reorder', wrap(async (req, res) => {
   const ids = Array.isArray(req.body?.ids) ? req.body.ids.map(Number).filter(Number.isInteger) : [];
   if (!ids.length) return res.status(422).json({ error: 'Liste vide.' });
